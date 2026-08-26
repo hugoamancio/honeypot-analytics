@@ -1,0 +1,317 @@
+<title>Kit de Publicação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    color-scheme: light;
+    --ground:   #E7ECEB;
+    --surface:  #F9FBFB;
+    --ink:      #0F1E1D;
+    --ink-2:    #465655;
+    --muted:    #788786;
+    --rule:     #CFD9D8;
+    --accent:   #0C6567;
+    --caution:  #96460F;
+    --caution-w:#F6E8DE;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground:   #0A1211;
+      --surface:  #121D1C;
+      --ink:      #E9F0EF;
+      --ink-2:    #A6B4B3;
+      --muted:    #788786;
+      --rule:     #233231;
+      --accent:   #3BA9AB;
+      --caution:  #D2843F;
+      --caution-w:#2A1C10;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground:   #0A1211;
+    --surface:  #121D1C;
+    --ink:      #E9F0EF;
+    --ink-2:    #A6B4B3;
+    --muted:    #788786;
+    --rule:     #233231;
+    --accent:   #3BA9AB;
+    --caution:  #D2843F;
+    --caution-w:#2A1C10;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    line-height: 1.6;
+  }
+
+  .folha { max-width: 900px; margin: 0 auto; padding: 52px 24px 90px;
+           display: flex; flex-direction: column; gap: 44px; }
+
+  .carimbo { font-family: "IBM Plex Mono", monospace; font-size: 11px;
+             letter-spacing: .16em; text-transform: uppercase; color: var(--accent);
+             font-weight: 500; }
+
+  h1 { font-family: "IBM Plex Sans Condensed", sans-serif; font-weight: 700;
+       font-size: clamp(36px, 6vw, 52px); line-height: 1.03; margin: 12px 0 14px;
+       letter-spacing: -.015em; text-wrap: balance; }
+
+  h2 { font-family: "IBM Plex Sans Condensed", sans-serif; font-weight: 600;
+       font-size: 25px; margin: 0 0 4px; letter-spacing: -.01em; }
+
+  .marca { font-family: "IBM Plex Mono", monospace; font-size: 11px;
+           letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+           font-weight: 500; }
+
+  p { margin: 0; max-width: 68ch; }
+  .nota { color: var(--ink-2); font-size: 15px; }
+
+  section { display: flex; flex-direction: column; gap: 16px; }
+
+  .aviso { background: var(--caution-w); border: 1px solid var(--caution);
+           padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; }
+  .aviso .t { font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
+              letter-spacing: .14em; text-transform: uppercase;
+              color: var(--caution); font-weight: 600; }
+
+  /* ---------- Texto do post ---------- */
+  .post { background: var(--surface); border: 1px solid var(--rule);
+          border-left: 3px solid var(--accent); padding: 26px 30px;
+          font-size: 15.5px; line-height: 1.72; white-space: pre-wrap;
+          color: var(--ink); }
+  .post .primeira { font-weight: 600; font-size: 17px; }
+
+  .contagem { font-family: "IBM Plex Mono", monospace; font-size: 11.5px;
+              color: var(--muted); }
+
+  /* ---------- Cartões de imagem ---------- */
+  .oficina { display: flex; flex-direction: column; gap: 14px; }
+
+  .moldura { overflow-x: auto; padding-bottom: 6px; }
+
+  .quadro {
+    width: 1080px; height: 1080px; flex: none;
+    background: #0A1211; color: #E9F0EF;
+    border: 1px solid var(--rule);
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 88px 84px; position: relative;
+    transform-origin: top left;
+  }
+  /* escala para caber na tela sem alterar o tamanho real da captura */
+  .escala { width: 100%; overflow: hidden; }
+  .escala > .quadro { transform: scale(var(--z, .62)); }
+  .escala { height: calc(1080px * var(--z, .62)); }
+
+  .quadro .topo { font-family: "IBM Plex Mono", monospace; font-size: 19px;
+                  letter-spacing: .17em; text-transform: uppercase; color: #3BA9AB;
+                  font-weight: 600; }
+
+  .quadro .gigante { font-family: "IBM Plex Sans Condensed", sans-serif;
+                     font-weight: 700; font-size: 190px; line-height: .9;
+                     letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .quadro .medio  { font-family: "IBM Plex Sans Condensed", sans-serif;
+                    font-weight: 700; font-size: 108px; line-height: 1;
+                    letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+  .quadro .frase  { font-size: 34px; line-height: 1.45; color: #A6B4B3;
+                    max-width: 22ch; margin-top: 26px; }
+  .quadro .frase b { color: #E9F0EF; font-weight: 600; }
+  .quadro .rodape { font-family: "IBM Plex Mono", monospace; font-size: 20px;
+                    color: #788786; display: flex; justify-content: space-between;
+                    align-items: flex-end; gap: 20px; }
+
+  .seta { color: #D2843F; }
+
+  .lista { display: flex; flex-direction: column; gap: 22px; margin-top: 8px; }
+  .lista .linha { display: flex; align-items: baseline; gap: 26px; }
+  .lista .n { font-family: "IBM Plex Mono", monospace; font-size: 46px;
+              font-weight: 600; color: #3BA9AB; min-width: 190px;
+              font-variant-numeric: tabular-nums; }
+  .lista .d { font-size: 30px; color: #A6B4B3; line-height: 1.35; }
+
+  ol.passos { margin: 0; padding-left: 22px; display: flex;
+              flex-direction: column; gap: 12px; color: var(--ink-2);
+              font-size: 15px; max-width: 66ch; }
+  ol.passos b { color: var(--ink); }
+
+  code { font-family: "IBM Plex Mono", monospace; font-size: .88em;
+         background: var(--surface); border: 1px solid var(--rule);
+         padding: 1px 6px; }
+
+  hr { border: none; border-top: 1px solid var(--rule); margin: 0; }
+
+  footer { color: var(--muted); font-size: 13px;
+           font-family: "IBM Plex Mono", monospace; line-height: 1.7; }
+
+  @media (max-width: 640px) {
+    .folha { padding: 34px 18px 64px; gap: 34px; }
+    .post { padding: 20px 18px; font-size: 14.5px; }
+    .escala > .quadro { transform: scale(var(--zm, .3)); }
+    .escala { height: calc(1080px * var(--zm, .3)); }
+  }
+</style>
+
+<div class="folha">
+
+  <header>
+    <div class="carimbo">Honeypot Analytics · material de divulgação</div>
+    <h1>Kit de Publicação</h1>
+    <p class="nota">
+      O texto pronto para copiar e as imagens em tamanho de LinkedIn
+      (1080 × 1080) para você capturar. Instruções de captura no fim.
+    </p>
+  </header>
+
+  <div class="aviso">
+    <div class="t">O limite que este post respeita</div>
+    <p>
+      O honeypot <strong>ainda não está no ar</strong>. Nenhuma frase aqui diz
+      ou insinua que existem ataques reais coletados — porque não existem. O
+      post fala do que foi construído e de um bug real encontrado, que é
+      verdade inteira e, por acaso, material melhor do que uma contagem
+      de ataques.
+    </p>
+    <p>
+      Quando o sensor subir e acumular algumas semanas, aí sim cabe um segundo
+      post com números reais. Esse vai ser mais forte ainda — e você vai poder
+      publicá-lo sem ressalva nenhuma.
+    </p>
+  </div>
+
+  <section>
+    <div>
+      <div class="marca">Copiar e colar</div>
+      <h2>Texto do post</h2>
+    </div>
+
+    <div class="post"><span class="primeira">Meu código funcionava. Rodei o mesmo arquivo duas vezes e descobri que ele duplicaria dados em produção todas as madrugadas.</span>
+
+Estou construindo um sistema de detecção de intrusão sobre um honeypot — um servidor isca que finge ser um SSH mal configurado para registrar quem tenta invadir.
+
+O pipeline controlava duplicata por hash do arquivo. Parecia suficiente. Reprocessei o mesmo log e a tabela de tentativas saltou de 5.916 para 11.832 linhas.
+
+A causa não era o teste. O log de um honeypot cresce durante o dia: o hash muda, o arquivo passa pela checagem, as sessões antigas voltam no processamento e são gravadas de novo. Duplicaria todo dia, em silêncio, e eu só perceberia quando algum número não fechasse.
+
+Corrigi movendo a garantia para o banco — uma chave natural — em vez de deixá-la numa checagem no Python. A diferença importa: regra que depende de alguém lembrar de aplicar não é garantia, é torcida.
+
+Esse foi um de três bugs que encontrei. Nenhum deles gerava erro. Todos rodavam perfeitamente mostrando a coisa errada, que é o tipo de defeito mais perigoso que existe.
+
+O que o projeto tem hoje:
+
+→ PostgreSQL modelado: 9 tabelas, 43 constraints, 30 índices — cada índice com justificativa escrita
+→ 11 regras de detecção em SQL, mapeadas ao MITRE ATT&CK
+→ Pipeline de ingestão idempotente em duas camadas
+→ Dashboard de triagem de alertas
+
+Os dados ainda são sintéticos: escrevi um gerador que produz log no formato exato do Cowrie para desenvolver tudo sem depender de infraestrutura. O sensor real sobe nas próximas semanas — e nenhuma linha de código muda quando ele entrar.
+
+Código aberto: github.com/hugoamancio/honeypot-analytics
+
+#cybersecurity #postgresql #python #sql #engenhariadedados</div>
+
+    <p class="contagem">≈ 1.850 caracteres · o limite do LinkedIn é 3.000</p>
+    <p class="nota">
+      A primeira linha é a única que aparece antes do “ver mais” no celular.
+      Por isso ela é um fato concreto e não uma apresentação — quem rola o
+      feed para em número estranho, não em “tenho o prazer de compartilhar”.
+    </p>
+  </section>
+
+  <hr>
+
+  <section class="oficina">
+    <div>
+      <div class="marca">Imagem 1 · 1080 × 1080</div>
+      <h2>O número que prende</h2>
+    </div>
+    <div class="escala">
+      <div class="quadro" id="quadro-1">
+        <div class="topo">O bug que não dava erro</div>
+        <div>
+          <div class="medio">5.916 <span class="seta">→</span> 11.832</div>
+          <p class="frase">
+            linhas na tabela depois de reprocessar
+            <b>o mesmo arquivo</b>. O código
+            não reclamou uma única vez.
+          </p>
+        </div>
+        <div class="rodape">
+          <span>honeypot-analytics</span>
+          <span>github.com/hugoamancio</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="oficina">
+    <div>
+      <div class="marca">Imagem 2 · 1080 × 1080</div>
+      <h2>O que existe hoje</h2>
+    </div>
+    <div class="escala">
+      <div class="quadro" id="quadro-2">
+        <div class="topo">Detecção de intrusão · em construção</div>
+        <div class="lista">
+          <div class="linha"><span class="n">9 · 43 · 30</span>
+            <span class="d">tabelas, constraints e índices</span></div>
+          <div class="linha"><span class="n">11</span>
+            <span class="d">regras em SQL, mapeadas ao MITRE ATT&amp;CK</span></div>
+          <div class="linha"><span class="n">2</span>
+            <span class="d">camadas de idempotência na ingestão</span></div>
+          <div class="linha"><span class="n">3</span>
+            <span class="d">bugs encontrados e corrigidos — nenhum gerava erro</span></div>
+        </div>
+        <div class="rodape">
+          <span>PostgreSQL · Python · Streamlit</span>
+          <span>github.com/hugoamancio</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <div>
+      <div class="marca">Passo a passo</div>
+      <h2>Como capturar e publicar</h2>
+    </div>
+
+    <ol class="passos">
+      <li>Nesta página, aperte <b>Win + Shift + S</b> e selecione um quadro
+        inteiro. Ele já está no formato quadrado que o LinkedIn usa.</li>
+      <li>Repita para o segundo quadro.</li>
+      <li>Com o dashboard rodando
+        (<code>streamlit run dashboard/app.py</code>), capture a tela dele
+        também — <b>screenshot do produto real vale mais que arte</b>, e essa
+        deve ser a <b>primeira</b> imagem do post.</li>
+      <li>No LinkedIn, publique as três juntas: dashboard, depois os dois
+        quadros. Post com imagem alcança bem mais que post só de texto.</li>
+      <li>Cole o texto, confira se o link do repositório aparece, e publique.</li>
+    </ol>
+
+    <p class="nota">
+      Um detalhe de alcance: o LinkedIn reduz a entrega de posts com link
+      externo no corpo. Se quiser maximizar, deixe o link no
+      <b>primeiro comentário</b> e escreva “link nos comentários” no lugar dele.
+      Vale a pena? Só se você quiser alcance amplo. Para ser encontrado por
+      recrutador, o link visível é mais direto.
+    </p>
+  </section>
+
+  <hr>
+
+  <footer>
+    Honeypot Analytics · kit preparado em 26/08/2026<br>
+    Segundo post, quando o sensor tiver ~3 semanas de coleta real:<br>
+    aí a manchete passa a ser o que os atacantes fizeram, não o que o código faz.
+  </footer>
+
+</div>
