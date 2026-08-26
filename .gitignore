@@ -1,0 +1,54 @@
+# ---------------------------------------------------------------------------
+#  Dados coletados
+#
+#  A pasta dados/ guarda o log do honeypot - hoje sintetico, amanha real.
+#  Fora do versionamento por tres motivos:
+#    1. volume: cresce indefinidamente (3 MB ja no dataset de teste);
+#    2. reprodutibilidade: `gerar_logs.py --seed 7` recria o arquivo identico,
+#       entao versionar o resultado seria versionar saida de funcao pura;
+#    3. privacidade: log real contem IPs de origem, que sao dado pessoal em
+#       varias jurisdicoes - nao entram num repositorio publico.
+# ---------------------------------------------------------------------------
+dados/*
+!dados/.gitkeep
+
+# ---------------------------------------------------------------------------
+#  Segredos
+#
+#  O docker-compose.yml versionado usa senha de desenvolvimento explicita
+#  ("trocar_em_producao"), o que e proposital: deixa claro que nao e segredo.
+#  Credencial de verdade entra por .env, que nunca e commitado.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+cowrie.cfg
+
+# ---------------------------------------------------------------------------
+#  Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---------------------------------------------------------------------------
+#  Streamlit
+# ---------------------------------------------------------------------------
+.streamlit/secrets.toml
+
+# ---------------------------------------------------------------------------
+#  Sistema operacional e editores
+# ---------------------------------------------------------------------------
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,8 @@
+# Driver PostgreSQL. [binary] traz o libpq compilado junto - sem isso o
+# Windows exige toolchain de C para instalar.
+psycopg[binary]==3.2.10
+
+# Dashboard (passo 6)
+streamlit==1.51.0
+pandas==2.3.3
+altair==5.5.0
