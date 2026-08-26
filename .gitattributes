@@ -1,0 +1,19 @@
+# Normaliza fim de linha.
+#
+# Sem isto, o Git no Windows converte LF para CRLF ao gravar no diretorio de
+# trabalho e emite aviso a cada `git add`. Pior: quem clonar em Linux ou macOS
+# ve o repositorio inteiro como modificado.
+#
+# `text=auto eol=lf` guarda tudo com LF no repositorio e entrega LF tambem no
+# checkout, entao o arquivo e identico em qualquer sistema.
+* text=auto eol=lf
+
+# Arquivos que precisam de CRLF para funcionar no Windows.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binarios: nunca converter.
+*.png binary
+*.jpg binary
+*.pdf binary
+*.gz  binary
