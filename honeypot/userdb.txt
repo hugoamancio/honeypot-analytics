@@ -1,0 +1,62 @@
+# ============================================================================
+#  Cowrie - quais credenciais "funcionam"
+#
+#  Copiar para  ~/cowrie/etc/userdb.txt  no servidor.
+#
+#  POR QUE ISTO IMPORTA MAIS DO QUE PARECE
+#
+#  A configuracao de fabrica do Cowrie aceita praticamente qualquer senha.
+#  Isso denuncia o honeypot na hora: nenhum servidor real aceita
+#  root/qualquercoisa, e bot bem escrito testa exatamente isso - manda uma
+#  senha aleatoria improvavel e, se entrar, sabe que e armadilha e sai.
+#
+#  Aceitando so um conjunto pequeno de senhas comuns, o comportamento fica
+#  igual ao de uma maquina real mal configurada: a maioria das tentativas
+#  falha, e de vez em quando uma acerta.
+#
+#  FORMATO
+#      usuario:x:senha         aceita exatamente essa senha
+#      usuario:x:!senha        REJEITA essa senha especificamente
+#      usuario:x:*             aceita qualquer senha (nao usar)
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+#  root - as senhas que realmente aparecem no topo de qualquer honeypot
+# ---------------------------------------------------------------------------
+
+# Rejeitadas de proposito ANTES do curinga: sao as duas primeiras que um
+# scanner de honeypot testa justamente por serem obvias demais.
+root:x:!root
+root:x:!toor
+
+root:x:123456
+root:x:admin
+root:x:password
+root:x:1234
+root:x:12345
+root:x:123123
+root:x:P@ssw0rd
+
+# ---------------------------------------------------------------------------
+#  Contas de servico - alvos classicos de varredura
+# ---------------------------------------------------------------------------
+admin:x:admin
+admin:x:1234
+admin:x:password
+ubuntu:x:ubuntu
+oracle:x:oracle
+postgres:x:postgres
+mysql:x:mysql
+pi:x:raspberry
+user:x:user
+test:x:test
+git:x:git
+deploy:x:deploy
+support:x:support
+
+# ---------------------------------------------------------------------------
+#  Nada de curinga aqui embaixo.
+#
+#  Uma linha `*:x:*` faria o honeypot aceitar tudo e o transformaria no
+#  comportamento que denuncia. A ausencia dela e deliberada.
+# ---------------------------------------------------------------------------
