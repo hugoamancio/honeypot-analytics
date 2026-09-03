@@ -81,12 +81,40 @@ def css(P):
       padding: 0;
   }}
 
+  /* ---- Colunas: quebrar linha em vez de espremer -----------------------
+     O Streamlit da as colunas `flex: 1 1 calc(20% - gap)` com
+     `min-width: auto`. Resultado: com 5 colunas numa janela estreita elas
+     encolhem indefinidamente em vez de quebrar. Medido a 810px de janela:
+     43px por cartao, texto picado em quatro linhas, e cada um com uma
+     altura diferente.
+
+     `flex-wrap: wrap` ja vem do Streamlit, mas nunca dispara porque nada
+     impede o encolhimento. O min-width e o gatilho que faltava: abaixo
+     dele, a coluna desce para a linha seguinte.                          */
+  [data-testid="stHorizontalBlock"] {{
+      align-items: stretch;
+  }}
+  [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {{
+      min-width: 186px;
+  }}
+
   /* ---- KPI -------------------------------------------------------------
-     min-height fixo: sem ele, um cartao cuja nota quebra em duas linhas
-     fica mais alto que os vizinhos e desalinha a fileira inteira. Foi o
-     que aconteceu com "178 comandos executados" (126px contra 107px).    */
+     Duas garantias diferentes, e as duas sao necessarias:
+
+       min-height  = piso. Impede que um cartao de nota curta fique baixo
+                     demais ao lado dos vizinhos.
+       height 100% = teto comum. Faz todos os cartoes da fileira esticarem
+                     ate o mais alto, entao a linha fica reta mesmo quando
+                     uma nota quebra em duas linhas e outra nao.
+
+     So o min-height nao basta: ele nivela por baixo, nao por cima.        */
+  [data-testid="stColumn"] [data-testid="stLayoutWrapper"]:has(.marca-cartao) {{
+      height: 100%;
+  }}
+
   .kpi {{
       min-height: 116px;
+      height: 100%;
       display: flex; flex-direction: column; justify-content: flex-start;
   }}
   .kpi .rotulo {{
