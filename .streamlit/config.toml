@@ -1,0 +1,34 @@
+# ============================================================================
+#  Tema do Streamlit
+#
+#  POR QUE ESTE ARQUIVO EXISTE
+#
+#  O Streamlit tem tema PROPRIO, independente do CSS do projeto, e por padrao
+#  ele segue o modo claro/escuro do navegador. Resultado: numa maquina em modo
+#  claro, os componentes dele (graficos, tabela, botoes) renderizavam claros
+#  enquanto o CSS do projeto forcava escuro - grafico de fundo branco dentro
+#  de cartao preto, e texto escuro sobre fundo escuro na barra lateral.
+#
+#  O defeito so apareceu ao gerar imagem num navegador limpo. Nos testes
+#  anteriores o navegador estava em modo escuro e escondeu o problema.
+#
+#  Fixar o tema aqui elimina a variavel: a tela fica igual em qualquer
+#  maquina, o que importa quando o dashboard vai ser aberto por um recrutador
+#  numa configuracao que voce nao controla.
+#
+#  As cores sao as mesmas de dashboard/paleta.py (tema ESCURO).
+# ============================================================================
+
+[theme]
+base = "dark"
+primaryColor = "#3BA9AB"
+backgroundColor = "#0A1211"
+secondaryBackgroundColor = "#121D1C"
+textColor = "#E9F0EF"
+font = "sans serif"
+
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false

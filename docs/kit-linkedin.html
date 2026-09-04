@@ -170,18 +170,22 @@
   </header>
 
   <div class="aviso">
-    <div class="t">O limite que este post respeita</div>
+    <div class="t">Atualizado — o sensor está no ar</div>
     <p>
-      O honeypot <strong>ainda não está no ar</strong>. Nenhuma frase aqui diz
-      ou insinua que existem ataques reais coletados — porque não existem. O
-      post fala do que foi construído e de um bug real encontrado, que é
-      verdade inteira e, por acaso, material melhor do que uma contagem
-      de ataques.
+      O honeypot foi implantado em <strong>04/09/2026</strong> e começou a
+      receber ataques reais em minutos. O texto abaixo foi reescrito para
+      refletir isso: a versão anterior dizia que o sensor subiria "nas
+      próximas semanas", o que deixou de ser verdade.
     </p>
     <p>
-      Quando o sensor subir e acumular algumas semanas, aí sim cabe um segundo
-      post com números reais. Esse vai ser mais forte ainda — e você vai poder
-      publicá-lo sem ressalva nenhuma.
+      Os números citados são <strong>das primeiras horas de coleta</strong> e
+      estão declarados como tais. Não infle: "4 atacantes em 18 minutos" é
+      verdade e é impressionante; "milhares de ataques" ainda não é.
+    </p>
+    <p>
+      Daqui a uma ou duas semanas cabe um <strong>segundo post</strong>, com
+      volume acumulado e as descobertas do dataset. Dois posts honestos valem
+      mais que um inflado.
     </p>
   </div>
 
@@ -191,36 +195,47 @@
       <h2>Texto do post</h2>
     </div>
 
-    <div class="post"><span class="primeira">Meu código funcionava. Rodei o mesmo arquivo duas vezes e descobri que ele duplicaria dados em produção todas as madrugadas.</span>
+    <div class="post"><span class="primeira">Coloquei um servidor isca na internet. Em 18 minutos, quatro atacantes diferentes já estavam tentando entrar.</span>
 
-Estou construindo um sistema de detecção de intrusão sobre um honeypot — um servidor isca que finge ser um SSH mal configurado para registrar quem tenta invadir.
+Passei as últimas semanas construindo um sistema de detecção de intrusão sobre um honeypot — um servidor que finge ser um SSH mal configurado só para registrar quem tenta invadir. Hoje ele foi ao ar.
 
-O pipeline controlava duplicata por hash do arquivo. Parecia suficiente. Reprocessei o mesmo log e a tabela de tentativas saltou de 5.916 para 11.832 linhas.
+Duas coisas que apareceram logo nas primeiras tentativas:
 
-A causa não era o teste. O log de um honeypot cresce durante o dia: o hash muda, o arquivo passa pela checagem, as sessões antigas voltam no processamento e são gravadas de novo. Duplicaria todo dia, em silêncio, e eu só perceberia quando algum número não fechasse.
+Uma senha chamada 7ujMko0admin. Não é um bot chutando: é a senha padrão de fábrica de câmeras Dahua. Quem mandou aquilo estava procurando especificamente por dispositivo IoT exposto.
 
-Corrigi movendo a garantia para o banco — uma chave natural — em vez de deixá-la numa checagem no Python. A diferença importa: regra que depende de alguém lembrar de aplicar não é garantia, é torcida.
+E, na porta Telnet, tentativas de login com bytes nulos crus no meio do nome de usuário — "enable\x00", "system\x00". É a assinatura da botnet Mirai varrendo atrás de roteador.
 
-Esse foi um de três bugs que encontrei. Nenhum deles gerava erro. Todos rodavam perfeitamente mostrando a coisa errada, que é o tipo de defeito mais perigoso que existe.
+Nenhum dado de teste que eu inventasse teria produzido isso. É por isso que dado real importa.
 
-O que o projeto tem hoje:
+Como o sistema funciona:
 
 → PostgreSQL modelado: 9 tabelas, 43 constraints, 30 índices — cada índice com justificativa escrita
-→ 11 regras de detecção em SQL, mapeadas ao MITRE ATT&CK
+→ 11 regras de detecção escritas em SQL, mapeadas ao MITRE ATT&CK
 → Pipeline de ingestão idempotente em duas camadas
 → Dashboard de triagem de alertas
 
-Os dados ainda são sintéticos: escrevi um gerador que produz log no formato exato do Cowrie para desenvolver tudo sem depender de infraestrutura. O sensor real sobe nas próximas semanas — e nenhuma linha de código muda quando ele entrar.
+E o que mais aprendi não foi construindo, foi quebrando.
+
+Meu pipeline controlava duplicata por hash do arquivo. Parecia suficiente. Reprocessei o mesmo log e a tabela saltou de 5.916 para 11.832 linhas — porque o log de um honeypot cresce durante o dia, o hash muda, e as sessões antigas voltam a ser gravadas. Duplicaria toda madrugada, em silêncio.
+
+Foi um de vários defeitos que nenhum teste pegou porque nenhum deles gerava erro. Todos rodavam perfeitamente mostrando a coisa errada — que é o tipo mais perigoso que existe.
+
+Os números acima são das primeiras horas. Volto com o dataset completo em algumas semanas.
 
 Código aberto: github.com/hugoamancio/honeypot-analytics
 
 #cybersecurity #postgresql #python #sql #engenhariadedados</div>
 
-    <p class="contagem">≈ 1.850 caracteres · o limite do LinkedIn é 3.000</p>
+    <p class="contagem">≈ 1.900 caracteres · o limite do LinkedIn é 3.000</p>
     <p class="nota">
       A primeira linha é a única que aparece antes do “ver mais” no celular.
       Por isso ela é um fato concreto e não uma apresentação — quem rola o
       feed para em número estranho, não em “tenho o prazer de compartilhar”.
+    </p>
+    <p class="nota">
+      O <b>7ujMko0admin</b> e o <b>Mirai</b> são o coração deste post. São
+      detalhes que só quem realmente operou um sensor teria — e é isso que
+      separa você de quem seguiu um tutorial.
     </p>
   </section>
 
@@ -233,13 +248,13 @@ Código aberto: github.com/hugoamancio/honeypot-analytics
     </div>
     <div class="escala">
       <div class="quadro" id="quadro-1">
-        <div class="topo">O bug que não dava erro</div>
+        <div class="topo">Primeiros 18 minutos no ar</div>
         <div>
-          <div class="medio">5.916 <span class="seta">→</span> 11.832</div>
+          <div class="gigante">4</div>
           <p class="frase">
-            linhas na tabela depois de reprocessar
-            <b>o mesmo arquivo</b>. O código
-            não reclamou uma única vez.
+            atacantes distintos encontraram o servidor
+            <b>antes de completar 20 minutos</b>
+            de vida na internet.
           </p>
         </div>
         <div class="rodape">
@@ -257,16 +272,16 @@ Código aberto: github.com/hugoamancio/honeypot-analytics
     </div>
     <div class="escala">
       <div class="quadro" id="quadro-2">
-        <div class="topo">Detecção de intrusão · em construção</div>
+        <div class="topo">O que os primeiros bots tentaram</div>
         <div class="lista">
-          <div class="linha"><span class="n">9 · 43 · 30</span>
-            <span class="d">tabelas, constraints e índices</span></div>
-          <div class="linha"><span class="n">11</span>
-            <span class="d">regras em SQL, mapeadas ao MITRE ATT&amp;CK</span></div>
-          <div class="linha"><span class="n">2</span>
-            <span class="d">camadas de idempotência na ingestão</span></div>
-          <div class="linha"><span class="n">3</span>
-            <span class="d">bugs encontrados e corrigidos — nenhum gerava erro</span></div>
+          <div class="linha"><span class="n">7ujMko0admin</span>
+            <span class="d">senha de fábrica de câmeras Dahua</span></div>
+          <div class="linha"><span class="n">enable\x00</span>
+            <span class="d">bytes nulos no Telnet — assinatura Mirai</span></div>
+          <div class="linha"><span class="n">root/1111</span>
+            <span class="d">força bruta clássica</span></div>
+          <div class="linha"><span class="n">libssh_0.9.6</span>
+            <span class="d">cliente de automação, nunca de pessoa</span></div>
         </div>
         <div class="rodape">
           <span>PostgreSQL · Python · Streamlit</span>

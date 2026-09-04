@@ -33,9 +33,51 @@ def css(P):
       padding: 2.2rem 2.4rem 4rem !important;
   }}
 
+  /* ---- Barra lateral ---------------------------------------------------
+     As cores do texto sao declaradas explicitamente porque o Streamlit tem
+     tema PROPRIO, que segue o config.toml — e o config.toml so e encontrado
+     quando o app roda a partir da raiz do projeto. Rodando de outro
+     diretorio, o tema dele caia no claro e a lateral ficava com texto
+     escuro sobre fundo escuro: "Sensor" e "Severidade" sumiam.
+
+     Depender de config externo para legibilidade e fragil. Aqui o CSS
+     garante, venha o tema de onde vier.                                    */
   [data-testid="stSidebar"] {{
       background: {P['surface']};
       border-right: 1px solid {P['borda']};
+  }}
+  [data-testid="stSidebar"] p,
+  [data-testid="stSidebar"] span,
+  [data-testid="stSidebar"] label,
+  [data-testid="stSidebar"] h1,
+  [data-testid="stSidebar"] h2,
+  [data-testid="stSidebar"] h3,
+  [data-testid="stSidebar"] strong {{
+      color: {P['texto']};
+  }}
+  [data-testid="stSidebar"] [data-testid="stCaptionContainer"],
+  [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{
+      color: {P['mudo']} !important;
+  }}
+  [data-testid="stSidebar"] code {{
+      color: {P['serie1']};
+      background: {P['pagina']};
+  }}
+
+  /* O botao seguia o tema do Streamlit: fundo branco com o texto branco que
+     a regra acima aplicou. Ficava invisivel. Cor propria resolve. */
+  [data-testid="stSidebar"] button {{
+      background: {P['pagina']} !important;
+      border: 1px solid {P['borda']} !important;
+  }}
+  [data-testid="stSidebar"] button p {{
+      color: {P['texto2']} !important;
+  }}
+  [data-testid="stSidebar"] button:hover {{
+      border-color: {P['serie1']} !important;
+  }}
+  [data-testid="stSidebar"] button:hover p {{
+      color: {P['serie1']} !important;
   }}
 
   /* ---- Tipografia ---------------------------------------------------- */

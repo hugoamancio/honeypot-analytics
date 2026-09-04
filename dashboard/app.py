@@ -154,7 +154,14 @@ def estilizar(chart, P, altura=260):
     transparente. O dado e o unico elemento com cor forte na tela.
     """
     return (chart
-            .properties(height=altura)
+            .properties(height=altura, background="transparent")
+            # background E fill sao coisas DIFERENTES no Vega:
+            #   fill       = area de plotagem (dentro dos eixos)
+            #   background = a tela inteira do grafico
+            # Limpar so o fill deixava o grafico com fundo BRANCO dentro de um
+            # cartao escuro. So apareceu ao gerar imagem num navegador em modo
+            # claro - nos testes anteriores o navegador estava escuro e
+            # escondeu o defeito.
             .configure_view(strokeWidth=0, fill=None)
             .configure_axis(
                 grid=True, gridColor=P["grade"], gridWidth=1,
@@ -206,12 +213,12 @@ with st.sidebar:
     st.markdown("### 🍯 Honeypot Analytics")
     st.caption("Sensor `honeypot-udi-01`")
     st.markdown("---")
-    escuro = st.toggle("Tema escuro", value=True)
     if st.button("Recarregar dados", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
 
-P = tema(escuro)
+# Tema fixo: ver .streamlit/config.toml para o porque.
+P = tema(escuro=True)
 st.markdown(css(P), unsafe_allow_html=True)
 
 with st.sidebar:
@@ -303,7 +310,7 @@ if not ativ.empty:
                      alt.Tooltip("tentativas:Q", title="tentativas", format=","),
                      alt.Tooltip("sessoes:Q", title="sessoes")],
         )
-        st.altair_chart(estilizar(linha, P, 260), use_container_width=True)
+        st.altair_chart(theme=None, altair_chart=estilizar(linha, P, 260), use_container_width=True)
 
 
 # --- 2. O achado principal, em destaque ------------------------------------
@@ -355,8 +362,7 @@ with e, st.container():
                tentativas
         FROM vw_top_credenciais LIMIT 12
     """)
-    st.altair_chart(
-        estilizar(barras_magnitude(cred, "tentativas", "par", P, "Tentativas"),
+    st.altair_chart(theme=None, altair_chart=estilizar(barras_magnitude(cred, "tentativas", "par", P, "Tentativas"),
                   P, 330),
         use_container_width=True)
 
@@ -387,7 +393,7 @@ with d, st.container():
                      alt.Tooltip("pct_acumulado:Q", title="% coberto",
                                  format=".1f")],
         )
-        st.altair_chart(estilizar(area, P, 330), use_container_width=True)
+        st.altair_chart(theme=None, altair_chart=estilizar(area, P, 330), use_container_width=True)
 
 
 # --- 4. Regras de deteccao -------------------------------------------------
@@ -430,7 +436,7 @@ if not regras.empty:
                      alt.Tooltip("alertas:Q", title="alertas", format=","),
                      alt.Tooltip("ips_envolvidos:Q", title="IPs")],
         )
-        st.altair_chart(estilizar(barras, P, 350), use_container_width=True)
+        st.altair_chart(theme=None, altair_chart=estilizar(barras, P, 350), use_container_width=True)
 
         mudas = regras[regras["alertas"] == 0]
         if not mudas.empty:
@@ -460,8 +466,10 @@ with e2, st.container():
                 "roda depois da coleta.")
     else:
         st.altair_chart(
-            estilizar(barras_magnitude(paises, "sessoes", "pais", P, "Sessoes"),
-                      P, 310),
+            theme=None,
+            altair_chart=estilizar(
+                barras_magnitude(paises, "sessoes", "pais", P, "Sessoes"),
+                P, 310),
             use_container_width=True)
         legenda("País é a métrica ingênua. O agrupamento por <b>ASN</b> — o "
                 "provedor dono do bloco de rede — revela muito mais, e já está "
@@ -506,7 +514,7 @@ with d2, st.container():
                      alt.Tooltip("segundos:Q", title="latencia (s)", format=".2f"),
                      alt.Tooltip("roteiro:N", title="playbook")],
         )
-        st.altair_chart(estilizar(pontos, P, 310), use_container_width=True)
+        st.altair_chart(theme=None, altair_chart=estilizar(pontos, P, 310), use_container_width=True)
         # Numeros calculados, nunca escritos a mao.
         legenda(
             f"Mostrando as <b>15 mais rápidas</b>. Nas "

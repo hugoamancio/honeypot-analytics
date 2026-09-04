@@ -52,3 +52,6 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# Imagens geradas para divulgacao - reproduziveis com o script de captura
+docs/imagens/
