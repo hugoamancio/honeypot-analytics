@@ -3,145 +3,184 @@
 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #050909; }
+  body { background: #202626; padding: 30px; display: flex;
+         flex-direction: column; gap: 30px; align-items: flex-start; }
 
-  /* 1200x1200 - o quadrado que o LinkedIn nao corta no feed.
-     A captura roda em 2x, entao o arquivo sai com 2400px de lado.
+  /* ==========================================================================
+     DOIS FORMATOS, e o motivo de nao ser um so:
 
-     Os dois paineis de baixo sao montados AQUI, nao colados como imagem
-     pronta: cada cartao tem rodape proprio com o link do GitHub, e colar
-     os tres repetia o mesmo endereco tres vezes na mesma placa. */
+     O LinkedIn reduz a imagem para a largura do feed - cerca de 550px no
+     desktop e 350px no celular. Uma placa quadrada e densa vira texto
+     ilegivel nesse tamanho, e o corte da previa come as bordas.
+
+     Os dois formatos abaixo sao os que o feed exibe inteiros:
+       paisagem 1200x627  (1.91:1) - o mais seguro, nunca cortado
+       retrato  1080x1350 (4:5)    - ocupa mais altura no feed
+
+     Em ambos: MENOS conteudo e tipografia MAIOR. A placa anterior tentava
+     caber dashboard + dois paineis e nao sobrevivia a reducao.
+     ========================================================================== */
+
   .placa {
-    width: 1200px; height: 1200px;
-    background: #050909; padding: 38px;
-    display: flex; flex-direction: column; gap: 18px;
+    background: #050909; position: relative; overflow: hidden;
     font-family: "IBM Plex Sans", system-ui, sans-serif;
-  }
-
-  .topo { display: flex; align-items: baseline; justify-content: space-between; }
-  .marca {
-    font-family: "IBM Plex Sans Condensed", sans-serif;
-    font-size: 31px; font-weight: 700; color: #E9F0EF; letter-spacing: -.01em;
-  }
-  .marca .em { color: #3BA9AB; }
-  .sub {
-    font-family: "IBM Plex Mono", monospace; font-size: 12.5px;
-    color: #788786; letter-spacing: .11em; text-transform: uppercase;
-  }
-
-  /* Recorte pelo topo: os KPIs e o primeiro grafico sao a parte que
-     comunica. A tela inteira encolhida ficaria ilegivel no feed. */
-  .painel {
-    width: 100%; height: 500px; flex: none;
-    border: 1px solid rgba(255,255,255,.09); border-radius: 10px;
-    overflow: hidden;
-  }
-  .painel img {
-    width: 100%; height: 100%;
-    object-fit: cover; object-position: top left; display: block;
-  }
-
-  .dupla { display: flex; gap: 18px; flex: 1; min-height: 0; }
-
-  /* Rotulo colado no topo, conteudo centrado no espaco que sobra.
-     Com space-between os dois paineis acumulavam vazio desigual embaixo -
-     o da esquerda tem menos conteudo que o da direita, e a diferenca
-     aparecia como um buraco so de um lado. */
-  .quadro {
-    flex: 1; background: #0A1211;
-    border: 1px solid rgba(255,255,255,.09); border-radius: 10px;
-    padding: 30px 32px;
     display: flex; flex-direction: column;
-    min-width: 0;
   }
-  .quadro > .corpo {
-    flex: 1; display: flex; flex-direction: column; justify-content: center;
-  }
-  .quadro .rotulo {
-    font-family: "IBM Plex Mono", monospace; font-size: 12.5px;
-    letter-spacing: .13em; text-transform: uppercase;
-    color: #3BA9AB; font-weight: 600;
-  }
+  .paisagem { width: 1200px; height: 627px; padding: 44px 50px; }
+  .retrato  { width: 1080px; height: 1350px; padding: 60px 58px; }
 
-  /* --- painel do numero --- */
-  .numerao {
-    font-family: "IBM Plex Sans Condensed", sans-serif;
-    font-weight: 700; font-size: 128px; line-height: .88;
-    color: #E9F0EF; letter-spacing: -.03em;
-  }
-  .frase {
-    font-size: 20px; line-height: 1.45; color: #A6B4B3; margin-top: 16px;
-  }
+  /* ---- Cabecalho ---- */
+  .topo { display: flex; align-items: baseline; justify-content: space-between;
+          flex: none; }
+  .marca { font-family: "IBM Plex Sans Condensed", sans-serif;
+           font-weight: 700; color: #E9F0EF; letter-spacing: -.015em; }
+  .marca .em { color: #3BA9AB; }
+  .paisagem .marca { font-size: 30px; }
+  .retrato  .marca { font-size: 42px; }
+
+  .sub { font-family: "IBM Plex Mono", monospace; color: #788786;
+         letter-spacing: .12em; text-transform: uppercase; }
+  .paisagem .sub { font-size: 12px; }
+  .retrato  .sub { font-size: 15px; }
+
+  /* ---- Corpo ---- */
+  .corpo { flex: 1; display: flex; min-height: 0; }
+  .paisagem .corpo { gap: 46px; align-items: center; padding: 32px 0; }
+  .retrato  .corpo { flex-direction: column; gap: 46px; justify-content: center; }
+
+  .manchete { flex: none; }
+  .paisagem .manchete { width: 46%; }
+
+  .numerao { font-family: "IBM Plex Sans Condensed", sans-serif;
+             font-weight: 700; color: #E9F0EF; letter-spacing: -.035em;
+             line-height: .82; }
+  .paisagem .numerao { font-size: 168px; }
+  .retrato  .numerao { font-size: 230px; }
+
+  .frase { color: #A6B4B3; line-height: 1.38; margin-top: 20px; }
   .frase b { color: #E9F0EF; font-weight: 600; }
+  .paisagem .frase { font-size: 25px; }
+  .retrato  .frase { font-size: 36px; margin-top: 26px; }
 
-  /* --- painel das credenciais --- */
-  .linhas { display: flex; flex-direction: column; gap: 20px; }
-  .linha { display: flex; flex-direction: column; gap: 3px; }
-  .linha .cred {
-    font-family: "IBM Plex Mono", monospace; font-size: 26px;
-    font-weight: 600; color: #3BA9AB; letter-spacing: -.01em;
-  }
-  .linha .oque { font-size: 15px; color: #A6B4B3; line-height: 1.35; }
+  /* ---- Credenciais ---- */
+  .lista { display: flex; flex-direction: column; min-width: 0; }
+  /* Na paisagem a lista ocupa a coluna da direita, entao cresce.
+     No retrato ela e um bloco empilhado: crescendo, esticava e jogava o
+     conteudo todo para cima, deixando um buraco na metade de baixo. */
+  .paisagem .lista { flex: 1; gap: 20px; }
+  .retrato  .lista { flex: none; gap: 34px; }
 
-  .base {
-    display: flex; justify-content: space-between; align-items: center;
-    font-family: "IBM Plex Mono", monospace; font-size: 14px;
-    color: #788786; flex: none;
-  }
+  .item { display: flex; flex-direction: column; gap: 2px; }
+  .cred { font-family: "IBM Plex Mono", monospace; font-weight: 600;
+          color: #3BA9AB; letter-spacing: -.01em; }
+  .oque { color: #A6B4B3; line-height: 1.3; }
+  .paisagem .cred { font-size: 27px; }
+  .paisagem .oque { font-size: 16px; }
+  .retrato  .cred { font-size: 40px; }
+  .retrato  .oque { font-size: 23px; }
+
+  .rotulo { font-family: "IBM Plex Mono", monospace; font-weight: 600;
+            color: #3BA9AB; letter-spacing: .13em; text-transform: uppercase; }
+  .paisagem .rotulo { font-size: 12.5px; margin-bottom: 16px; }
+  .retrato  .rotulo { font-size: 16px; margin-bottom: 22px; }
+
+  /* ---- Rodape ---- */
+  .base { display: flex; justify-content: space-between; align-items: center;
+          font-family: "IBM Plex Mono", monospace; color: #788786; flex: none;
+          border-top: 1px solid rgba(255,255,255,.09); }
   .base .tags { color: #4E5857; }
+  .paisagem .base { font-size: 14px; padding-top: 20px; }
+  .retrato  .base { font-size: 18px; padding-top: 28px; }
+
+  .etiqueta { position: absolute; top: -26px; left: 0;
+              font: 500 13px "IBM Plex Mono", monospace; color: #9AA6A5; }
+  .envelope { position: relative; margin-top: 30px; }
 </style>
 
-<div class="placa">
+<!-- ====================== PAISAGEM 1200 x 627 ====================== -->
+<div class="envelope">
+  <div class="etiqueta">paisagem · 1200 × 627 · o formato mais seguro do feed</div>
+  <div class="placa paisagem" id="placa-paisagem">
 
-  <div class="topo">
-    <div class="marca">Honeypot <span class="em">Analytics</span></div>
-    <div class="sub">Detecção de intrusão</div>
-  </div>
-
-  <div class="painel">
-    <img src="imagens/post-dashboard.png" alt="Dashboard de triagem de alertas">
-  </div>
-
-  <div class="dupla">
-
-    <div class="quadro">
-      <div class="rotulo">Primeiros 18 minutos no ar</div>
-      <div class="corpo">
-        <div class="numerao">4</div>
-        <p class="frase">
-          atacantes distintos encontraram o servidor
-          <b>antes de completar 20 minutos</b> de vida na internet.
-        </p>
-      </div>
+    <div class="topo">
+      <div class="marca">Honeypot <span class="em">Analytics</span></div>
+      <div class="sub">Detecção de intrusão</div>
     </div>
 
-    <div class="quadro">
-      <div class="rotulo">O que os primeiros bots tentaram</div>
-      <div class="corpo linhas">
-        <div class="linha">
+    <div class="corpo">
+      <div class="manchete">
+        <div class="numerao">4</div>
+        <p class="frase">
+          atacantes encontraram meu servidor isca
+          <b>nos primeiros 18 minutos</b> no ar.
+        </p>
+      </div>
+
+      <div class="lista">
+        <div class="rotulo">O que eles tentaram</div>
+        <div class="item">
           <span class="cred">7ujMko0admin</span>
           <span class="oque">senha de fábrica de câmeras Dahua</span>
         </div>
-        <div class="linha">
+        <div class="item">
           <span class="cred">enable\x00</span>
           <span class="oque">bytes nulos no Telnet — assinatura Mirai</span>
         </div>
-        <div class="linha">
-          <span class="cred">root/1111</span>
-          <span class="oque">força bruta clássica</span>
-        </div>
-        <div class="linha">
+        <div class="item">
           <span class="cred">libssh_0.9.6</span>
           <span class="oque">cliente de automação, nunca de pessoa</span>
         </div>
       </div>
     </div>
 
-  </div>
+    <div class="base">
+      <span>github.com/hugoamancio/honeypot-analytics</span>
+      <span class="tags">PostgreSQL · Python</span>
+    </div>
 
-  <div class="base">
-    <span>github.com/hugoamancio/honeypot-analytics</span>
-    <span class="tags">PostgreSQL · Python · Streamlit</span>
   </div>
+</div>
 
+<!-- ====================== RETRATO 1080 x 1350 ====================== -->
+<div class="envelope">
+  <div class="etiqueta">retrato · 1080 × 1350 · ocupa mais altura no feed</div>
+  <div class="placa retrato" id="placa-retrato">
+
+    <div class="topo">
+      <div class="marca">Honeypot <span class="em">Analytics</span></div>
+      <div class="sub">Detecção de intrusão</div>
+    </div>
+
+    <div class="corpo">
+      <div class="manchete">
+        <div class="numerao">4</div>
+        <p class="frase">
+          atacantes encontraram meu servidor isca
+          <b>nos primeiros 18 minutos</b> no ar.
+        </p>
+      </div>
+
+      <div class="lista">
+        <div class="rotulo">O que eles tentaram</div>
+        <div class="item">
+          <span class="cred">7ujMko0admin</span>
+          <span class="oque">senha de fábrica de câmeras Dahua</span>
+        </div>
+        <div class="item">
+          <span class="cred">enable\x00</span>
+          <span class="oque">bytes nulos no Telnet — assinatura Mirai</span>
+        </div>
+        <div class="item">
+          <span class="cred">libssh_0.9.6</span>
+          <span class="oque">cliente de automação, nunca de pessoa</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="base">
+      <span>github.com/hugoamancio</span>
+      <span class="tags">PostgreSQL · Python</span>
+    </div>
+
+  </div>
 </div>
