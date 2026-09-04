@@ -1,0 +1,147 @@
+<title>Composição do Post</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #050909; }
+
+  /* 1200x1200 - o quadrado que o LinkedIn nao corta no feed.
+     A captura roda em 2x, entao o arquivo sai com 2400px de lado.
+
+     Os dois paineis de baixo sao montados AQUI, nao colados como imagem
+     pronta: cada cartao tem rodape proprio com o link do GitHub, e colar
+     os tres repetia o mesmo endereco tres vezes na mesma placa. */
+  .placa {
+    width: 1200px; height: 1200px;
+    background: #050909; padding: 38px;
+    display: flex; flex-direction: column; gap: 18px;
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+  }
+
+  .topo { display: flex; align-items: baseline; justify-content: space-between; }
+  .marca {
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-size: 31px; font-weight: 700; color: #E9F0EF; letter-spacing: -.01em;
+  }
+  .marca .em { color: #3BA9AB; }
+  .sub {
+    font-family: "IBM Plex Mono", monospace; font-size: 12.5px;
+    color: #788786; letter-spacing: .11em; text-transform: uppercase;
+  }
+
+  /* Recorte pelo topo: os KPIs e o primeiro grafico sao a parte que
+     comunica. A tela inteira encolhida ficaria ilegivel no feed. */
+  .painel {
+    width: 100%; height: 500px; flex: none;
+    border: 1px solid rgba(255,255,255,.09); border-radius: 10px;
+    overflow: hidden;
+  }
+  .painel img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: top left; display: block;
+  }
+
+  .dupla { display: flex; gap: 18px; flex: 1; min-height: 0; }
+
+  /* Rotulo colado no topo, conteudo centrado no espaco que sobra.
+     Com space-between os dois paineis acumulavam vazio desigual embaixo -
+     o da esquerda tem menos conteudo que o da direita, e a diferenca
+     aparecia como um buraco so de um lado. */
+  .quadro {
+    flex: 1; background: #0A1211;
+    border: 1px solid rgba(255,255,255,.09); border-radius: 10px;
+    padding: 30px 32px;
+    display: flex; flex-direction: column;
+    min-width: 0;
+  }
+  .quadro > .corpo {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+  }
+  .quadro .rotulo {
+    font-family: "IBM Plex Mono", monospace; font-size: 12.5px;
+    letter-spacing: .13em; text-transform: uppercase;
+    color: #3BA9AB; font-weight: 600;
+  }
+
+  /* --- painel do numero --- */
+  .numerao {
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-weight: 700; font-size: 128px; line-height: .88;
+    color: #E9F0EF; letter-spacing: -.03em;
+  }
+  .frase {
+    font-size: 20px; line-height: 1.45; color: #A6B4B3; margin-top: 16px;
+  }
+  .frase b { color: #E9F0EF; font-weight: 600; }
+
+  /* --- painel das credenciais --- */
+  .linhas { display: flex; flex-direction: column; gap: 20px; }
+  .linha { display: flex; flex-direction: column; gap: 3px; }
+  .linha .cred {
+    font-family: "IBM Plex Mono", monospace; font-size: 26px;
+    font-weight: 600; color: #3BA9AB; letter-spacing: -.01em;
+  }
+  .linha .oque { font-size: 15px; color: #A6B4B3; line-height: 1.35; }
+
+  .base {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: "IBM Plex Mono", monospace; font-size: 14px;
+    color: #788786; flex: none;
+  }
+  .base .tags { color: #4E5857; }
+</style>
+
+<div class="placa">
+
+  <div class="topo">
+    <div class="marca">Honeypot <span class="em">Analytics</span></div>
+    <div class="sub">Detecção de intrusão</div>
+  </div>
+
+  <div class="painel">
+    <img src="imagens/post-dashboard.png" alt="Dashboard de triagem de alertas">
+  </div>
+
+  <div class="dupla">
+
+    <div class="quadro">
+      <div class="rotulo">Primeiros 18 minutos no ar</div>
+      <div class="corpo">
+        <div class="numerao">4</div>
+        <p class="frase">
+          atacantes distintos encontraram o servidor
+          <b>antes de completar 20 minutos</b> de vida na internet.
+        </p>
+      </div>
+    </div>
+
+    <div class="quadro">
+      <div class="rotulo">O que os primeiros bots tentaram</div>
+      <div class="corpo linhas">
+        <div class="linha">
+          <span class="cred">7ujMko0admin</span>
+          <span class="oque">senha de fábrica de câmeras Dahua</span>
+        </div>
+        <div class="linha">
+          <span class="cred">enable\x00</span>
+          <span class="oque">bytes nulos no Telnet — assinatura Mirai</span>
+        </div>
+        <div class="linha">
+          <span class="cred">root/1111</span>
+          <span class="oque">força bruta clássica</span>
+        </div>
+        <div class="linha">
+          <span class="cred">libssh_0.9.6</span>
+          <span class="oque">cliente de automação, nunca de pessoa</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="base">
+    <span>github.com/hugoamancio/honeypot-analytics</span>
+    <span class="tags">PostgreSQL · Python · Streamlit</span>
+  </div>
+
+</div>
