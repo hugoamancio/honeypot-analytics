@@ -168,10 +168,29 @@ def css(P):
       line-height: 1.5;
   }}
 
-  /* ---- Legenda de grafico ---------------------------------------------- */
+  /* ---- Cabecalho de grafico -------------------------------------------
+     Todo grafico ganha titulo e uma frase em linguagem simples, no MESMO
+     formato. Antes a explicacao vivia ora no cabecalho da secao, ora numa
+     legenda solta, e dois graficos nao tinham nenhuma - quem abrisse a tela
+     sem conhecer o projeto olhava barras sem saber do que eram.
+
+     A frase responde "o que estou vendo", nao "como foi calculado". Detalhe
+     tecnico vai para o rodape do cartao.                                   */
+  .gtitulo {{
+      color: {P['texto']}; font-size: 17.5px; font-weight: 600;
+      letter-spacing: -.01em; margin: 0 0 5px 0; line-height: 1.25;
+  }}
+  .gexplica {{
+      color: {P['texto2']}; font-size: 13.5px; line-height: 1.55;
+      margin: 0 0 16px 0; max-width: 72ch;
+  }}
+  .gexplica b {{ color: {P['texto']}; font-weight: 600; }}
+
+  /* ---- Rodape de grafico: a ressalva tecnica, discreta ---------------- */
   .legenda {{
       color: {P['mudo']}; font-size: 11.5px; line-height: 1.5;
-      margin: 2px 0 6px; max-width: 74ch;
+      margin: 10px 0 4px; max-width: 74ch;
+      padding-top: 10px; border-top: 1px solid {P['borda']};
   }}
   .legenda b {{ color: {P['texto2']}; }}
 

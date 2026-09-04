@@ -114,15 +114,6 @@ def cartao():
     st.markdown('<span class="marca-cartao"></span>', unsafe_allow_html=True)
 
 
-def secao(olho, titulo, contexto=""):
-    st.markdown(
-        f"""<div class="secao">
-              <div class="olho">{olho}</div>
-              <p class="titulo">{titulo}</p>
-              {f'<p class="contexto">{contexto}</p>' if contexto else ''}
-            </div>""",
-        unsafe_allow_html=True)
-
 
 def kpi(rotulo, valor, nota="", cor=None):
     estilo = f"color:{cor};" if cor else ""
@@ -135,7 +126,25 @@ def kpi(rotulo, valor, nota="", cor=None):
         unsafe_allow_html=True)
 
 
+def cabecalho_grafico(titulo, explicacao):
+    """
+    Titulo e explicacao de um grafico, sempre no mesmo formato.
+
+    A explicacao responde "o que estou vendo", em linguagem de quem nunca viu
+    o projeto - nao "como foi calculado". Ressalva tecnica vai em legenda(),
+    embaixo do grafico.
+
+    Antes disso a explicacao vivia ora no cabecalho da secao, ora numa legenda
+    solta, e dois graficos nao tinham nenhuma: quem abrisse a tela sem
+    conhecer o projeto via barras sem saber do que eram.
+    """
+    st.markdown(f'<p class="gtitulo">{titulo}</p>'
+                f'<p class="gexplica">{explicacao}</p>',
+                unsafe_allow_html=True)
+
+
 def legenda(texto):
+    """Rodape discreto do cartao: a ressalva tecnica, para quem quiser."""
     st.markdown(f'<p class="legenda">{texto}</p>', unsafe_allow_html=True)
 
 
@@ -252,14 +261,18 @@ for col, (rot, val, nota, cor) in zip(colunas, metricas):
         cartao()
         kpi(rot, val, nota, cor)
 
-
 # ===========================================================================
-#  Atividade
+#  Graficos
+#
+#  Um cartao por grafico, todos no mesmo molde:
+#      cabecalho_grafico(titulo, explicacao)  ->  grafico  ->  legenda opcional
+#
+#  Os cabecalhos de secao sairam. Eles repetiam o que a explicacao do grafico
+#  ja dizia e empurravam o conteudo para baixo - a tela ficava com tres niveis
+#  de titulo antes do primeiro dado.
 # ===========================================================================
 
-secao("Volume", "Atividade ao longo do tempo",
-      "Duas series porque SSH e Telnet sao alvos distintos: Telnet delata "
-      "botnet de IoT, que varre porta 23 procurando camera e roteador.")
+# --- 1. Atividade ao longo do tempo ----------------------------------------
 
 ativ = consultar("""
     SELECT hora, protocolo::text AS protocolo, sessoes, tentativas
@@ -269,11 +282,18 @@ ativ = consultar("""
 if not ativ.empty:
     with st.container():
         cartao()
+        cabecalho_grafico(
+            "Quando os ataques chegam",
+            "Cada linha mostra quantas tentativas de invasão o servidor "
+            "recebeu por hora. <b>SSH</b> e <b>Telnet</b> aparecem separados "
+            "porque atraem atacantes diferentes: Telnet é o território das "
+            "botnets de câmera e roteador.")
+
         linha = alt.Chart(ativ).mark_line(
             strokeWidth=2, interpolate="monotone",
         ).encode(
             x=alt.X("hora:T", title=None,
-                    axis=alt.Axis(format="%d/%m", tickCount=12)),
+                    axis=alt.Axis(format="%d/%m", tickCount=10)),
             y=alt.Y("tentativas:Q", title="Tentativas por hora"),
             color=alt.Color("protocolo:N", title="PROTOCOLO",
                             scale=alt.Scale(domain=["ssh", "telnet"],
@@ -283,12 +303,10 @@ if not ativ.empty:
                      alt.Tooltip("tentativas:Q", title="tentativas", format=","),
                      alt.Tooltip("sessoes:Q", title="sessoes")],
         )
-        st.altair_chart(estilizar(linha, P, 250), use_container_width=True)
+        st.altair_chart(estilizar(linha, P, 260), use_container_width=True)
 
 
-# ===========================================================================
-#  Credenciais
-# ===========================================================================
+# --- 2. O achado principal, em destaque ------------------------------------
 
 conc = consultar("""
     SELECT posicao, senha, pct_acumulado
@@ -298,43 +316,40 @@ dez = conc[conc["posicao"] == 10]
 pct10 = float(dez.iloc[0]["pct_acumulado"]) if not dez.empty else None
 
 # O denominador importa e nao pode ficar de fora: "10 senhas cobrem 83%" soa
-# muito diferente se o universo tem 24 senhas ou 40 mil. Enquanto a fonte for
-# o gerador sintetico, o universo e pequeno por construcao e a concentracao
-# sai inflada. Mostrar o total distinto deixa o leitor calibrar sozinho.
+# muito diferente se o universo tem 24 senhas ou 40 mil.
 universo = int(consultar(
     "SELECT COUNT(DISTINCT senha) AS n FROM credencial").iloc[0]["n"])
-
-secao("Credenciais", "O dicionario dos atacantes",
-      "A curva a direita e o achado pratico do painel: mede quantas senhas "
-      "distintas bastam para cobrir a maior parte do trafego de ataque.")
 
 if pct10 is not None:
     st.markdown(
         f"""<div class="destaque">
               <div class="numero">{pct10:.1f}%</div>
               <div class="texto">
-                de <b>todas</b> as {milhar(resumo['tentativas'])} tentativas usaram
-                apenas <b>10 senhas</b>, de {universo} distintas no total.
-                Uma politica que barre esse punhado elimina a maior parte do
-                trafego de ataque — sem firewall, sem WAF, sem custo.
+                de <b>todas</b> as {milhar(resumo['tentativas'])} tentativas
+                usaram apenas <b>10 senhas</b>, de {universo} distintas no
+                total. Bloquear esse punhado elimina a maior parte do tráfego
+                de ataque — sem firewall, sem WAF, sem custo.
                 <br><span style="color:{P['mudo']};font-size:11.5px;">
-                Ressalva: o dicionario do gerador sintetico tem so {universo}
-                senhas, entao a concentracao aqui sai inflada. Com o sensor
-                real — onde aparecem milhares de senhas distintas — o numero
-                cai, e precisa ser medido de novo.
+                Ressalva: com dicionário pequeno a concentração sai inflada.
+                Com mais dados, o número precisa ser medido de novo.
                 </span>
               </div>
             </div>""",
         unsafe_allow_html=True)
 
+
+# --- 3. Credenciais: o que tentam, e o quanto se repete --------------------
+
 e, d = st.columns(2, gap="medium")
 
 with e, st.container():
-
     cartao()
-    legenda("Pares <b>usuario / senha</b> mais tentados. "
-            "<b>root</b> domina porque e o unico usuario que existe em "
-            "praticamente todo Linux — o bot nao precisa adivinhar o nome.")
+    cabecalho_grafico(
+        "As senhas mais tentadas",
+        "Os pares <b>usuário / senha</b> que os invasores mais usaram. "
+        "<b>root</b> domina porque é o único usuário que existe em "
+        "praticamente todo Linux — o bot não precisa adivinhar o nome.")
+
     cred = consultar("""
         SELECT usuario || ' / ' || COALESCE(NULLIF(senha, ''), '(vazia)') AS par,
                tentativas
@@ -346,12 +361,14 @@ with e, st.container():
         use_container_width=True)
 
 with d, st.container():
-
     cartao()
-    legenda("Curva de cobertura acumulada. Quanto mais rapido ela sobe, "
-            "mais concentrado — e mais facil de bloquear — e o ataque.")
+    cabecalho_grafico(
+        "Quantas senhas cobrem tudo",
+        "Lendo da esquerda para a direita: se você bloquear as N senhas mais "
+        "tentadas, que fatia dos ataques desaparece. <b>Quanto mais rápido a "
+        "curva sobe, mais fácil é se defender.</b>")
+
     if not conc.empty:
-        # Uma serie so: sem caixa de legenda, o titulo do eixo ja identifica.
         area = alt.Chart(conc).mark_area(
             line={"color": P["serie1"], "strokeWidth": 2},
             color=alt.Gradient(
@@ -361,21 +378,19 @@ with d, st.container():
                 x1=1, x2=1, y1=1, y2=0),
             opacity=0.3,
         ).encode(
-            x=alt.X("posicao:Q", title="As N senhas mais tentadas",
+            x=alt.X("posicao:Q", title="Senhas bloqueadas (as N mais tentadas)",
                     scale=alt.Scale(nice=False, domainMin=1)),
-            y=alt.Y("pct_acumulado:Q", title="% das tentativas cobertas",
+            y=alt.Y("pct_acumulado:Q", title="% dos ataques bloqueados",
                     scale=alt.Scale(domain=[0, 100])),
-            tooltip=[alt.Tooltip("posicao:Q", title="top N"),
+            tooltip=[alt.Tooltip("posicao:Q", title="bloqueando as N mais"),
                      alt.Tooltip("senha:N", title="senha nesta posicao"),
-                     alt.Tooltip("pct_acumulado:Q", title="% acumulado",
+                     alt.Tooltip("pct_acumulado:Q", title="% coberto",
                                  format=".1f")],
         )
         st.altair_chart(estilizar(area, P, 330), use_container_width=True)
 
 
-# ===========================================================================
-#  Deteccao
-# ===========================================================================
+# --- 4. Regras de deteccao -------------------------------------------------
 
 regras = consultar("""
     SELECT codigo, COALESCE(mitre_tecnica, '—') AS mitre,
@@ -383,18 +398,20 @@ regras = consultar("""
     FROM vw_alertas_por_regra ORDER BY alertas DESC
 """)
 
-secao("Deteccao", "Regras e disparos",
-      "Cada regra e uma query SQL mapeada para uma tecnica do MITRE ATT&CK, "
-      "o vocabulario padrao da industria para descrever comportamento de "
-      "atacante. Cor de severidade sempre acompanhada de icone e rotulo.")
-
 if not regras.empty:
     regras["rotulo"] = (regras["severidade"].map(ICONE_SEVERIDADE) + "  "
                         + regras["codigo"] + "   " + regras["mitre"])
 
     with st.container():
-
         cartao()
+        cabecalho_grafico(
+            "O que cada regra detectou",
+            "Cada barra é uma regra de detecção — uma consulta SQL que procura "
+            "um comportamento específico de atacante. O código ao lado "
+            "(<b>T1110</b>, <b>T1496</b>…) é a técnica correspondente no "
+            "<b>MITRE ATT&amp;CK</b>, o catálogo que a indústria usa para "
+            "nomear táticas de invasão. A cor indica a gravidade.")
+
         barras = alt.Chart(regras).mark_bar(
             cornerRadiusEnd=4, height={"band": 0.7},
         ).encode(
@@ -402,55 +419,55 @@ if not regras.empty:
             y=alt.Y("rotulo:N", sort="-x", title=None),
             # Paleta de status, nunca a categorica: severidade nao e
             # "mais uma serie" e nao pode se confundir com uma.
-            color=alt.Color("severidade:N", title="SEVERIDADE",
+            color=alt.Color("severidade:N", title="GRAVIDADE",
                             scale=alt.Scale(
                                 domain=ORDEM_SEVERIDADE,
                                 range=[SEVERIDADE[s] for s in ORDEM_SEVERIDADE]),
                             sort=ORDEM_SEVERIDADE),
             tooltip=[alt.Tooltip("codigo:N", title="regra"),
                      alt.Tooltip("mitre:N", title="MITRE ATT&CK"),
-                     alt.Tooltip("severidade:N", title="severidade"),
+                     alt.Tooltip("severidade:N", title="gravidade"),
                      alt.Tooltip("alertas:Q", title="alertas", format=","),
                      alt.Tooltip("ips_envolvidos:Q", title="IPs")],
         )
         st.altair_chart(estilizar(barras, P, 350), use_container_width=True)
 
-    mudas = regras[regras["alertas"] == 0]
-    if not mudas.empty:
-        st.warning(
-            "Sem nenhum disparo: **" + ", ".join(mudas["codigo"]) + "**. "
-            "Regra silenciosa e indistinguivel de regra quebrada — confirme "
-            "que os dados exercitam esse padrao antes de confiar nela.")
+        mudas = regras[regras["alertas"] == 0]
+        if not mudas.empty:
+            legenda(
+                "Sem nenhum disparo: <b>" + ", ".join(mudas["codigo"]) + "</b>. "
+                "Regra silenciosa é indistinguível de regra quebrada — confirme "
+                "que os dados exercitam esse padrão antes de confiar nela.")
 
 
-# ===========================================================================
-#  Comportamento
-# ===========================================================================
-
-secao("Comportamento", "Origem e tempo de reacao",
-      "A latencia a direita mede o intervalo entre autenticar e digitar o "
-      "primeiro comando. E a evidencia mais direta de automacao no painel.")
+# --- 5. Origem e tempo de reacao -------------------------------------------
 
 e2, d2 = st.columns(2, gap="medium")
 
 with e2, st.container():
-
     cartao()
-    legenda("Sessoes por pais de origem. Pais e a metrica ingenua — o "
-            "agrupamento por <b>ASN</b> (o provedor dono do bloco de rede) "
-            "revela muito mais, e ja esta em <code>vw_infra_atacante</code>.")
+    cabecalho_grafico(
+        "De onde vêm os ataques",
+        "Quantidade de sessões por país de origem do endereço IP.")
+
     paises = consultar("""
         SELECT pais, SUM(sessoes)::int AS sessoes
         FROM vw_infra_atacante WHERE pais IS NOT NULL
         GROUP BY pais ORDER BY sessoes DESC LIMIT 12
     """)
-    st.altair_chart(
-        estilizar(barras_magnitude(paises, "sessoes", "pais", P, "Sessoes"),
-                  P, 310),
-        use_container_width=True)
+    if paises.empty:
+        st.info("Sem dado de país ainda — o enriquecimento por geolocalização "
+                "roda depois da coleta.")
+    else:
+        st.altair_chart(
+            estilizar(barras_magnitude(paises, "sessoes", "pais", P, "Sessoes"),
+                      P, 310),
+            use_container_width=True)
+        legenda("País é a métrica ingênua. O agrupamento por <b>ASN</b> — o "
+                "provedor dono do bloco de rede — revela muito mais, e já está "
+                "em <code>vw_infra_atacante</code>.")
 
 with d2, st.container():
-
     cartao()
     lat = consultar("""
         SELECT ip, pais, latencia_1o_comando AS segundos, roteiro
@@ -458,11 +475,6 @@ with d2, st.container():
         WHERE latencia_1o_comando IS NOT NULL
         ORDER BY latencia_1o_comando LIMIT 15
     """)
-    # Estatistica da POPULACAO INTEIRA, nao das 15 linhas plotadas.
-    # Calcular a mediana sobre o LIMIT 15 daria a mediana das mais rapidas
-    # (0,16s) e a legenda, colada embaixo do grafico, seria lida como se
-    # fosse o numero global (0,47s). Mesma classe de erro do marco zero:
-    # o valor esta certo, o que ele mede e que nao e o que o texto promete.
     lat_geral = consultar("""
         SELECT ROUND(MIN(latencia_1o_comando), 2) AS minimo,
                ROUND(percentile_cont(0.5) WITHIN GROUP
@@ -471,16 +483,16 @@ with d2, st.container():
                COUNT(*) AS n
         FROM vw_playbook_inicial WHERE latencia_1o_comando IS NOT NULL
     """).iloc[0]
-    if not lat.empty:
-        # Numeros calculados, nunca escritos a mao: legenda com valor fixo
-        # envelhece em silencio assim que o dado muda.
-        legenda(
-            f"As <b>15 sessoes mais rapidas</b>. Marco zero = instante da "
-            f"<b>autenticacao</b>, nao da conexao. Nas "
-            f"<b>{int(lat_geral['n'])}</b> sessoes com comando, a mediana e "
-            f"<b>{lat_geral['mediana']:.2f}s</b> e o maximo "
-            f"<b>{lat_geral['maximo']:.2f}s</b> — nenhuma passa de um segundo. "
-            f"Nenhum humano le a tela e digita nesse tempo.")
+
+    cabecalho_grafico(
+        "Bot ou pessoa?",
+        "Tempo entre o invasor conseguir entrar e digitar o primeiro comando. "
+        "<b>Uma pessoa lê a tela antes de digitar; um programa não.</b> "
+        "Valores abaixo de um segundo são automação, sem exceção.")
+
+    if lat.empty:
+        st.info("Nenhuma sessão executou comandos ainda.")
+    else:
         pontos = alt.Chart(lat).mark_circle(
             size=120, opacity=0.9,
             stroke=P["surface"], strokeWidth=2,   # anel separa marcas sobrepostas
@@ -495,15 +507,16 @@ with d2, st.container():
                      alt.Tooltip("roteiro:N", title="playbook")],
         )
         st.altair_chart(estilizar(pontos, P, 310), use_container_width=True)
+        # Numeros calculados, nunca escritos a mao.
+        legenda(
+            f"Mostrando as <b>15 mais rápidas</b>. Nas "
+            f"<b>{int(lat_geral['n'])}</b> sessões com comandos, a mediana é "
+            f"<b>{lat_geral['mediana']:.2f}s</b> e a maior é "
+            f"<b>{lat_geral['maximo']:.2f}s</b>. O marco zero é o instante da "
+            f"autenticação, não o da conexão.")
 
 
-# ===========================================================================
-#  Fila de triagem
-# ===========================================================================
-
-secao("Triagem", "Fila de alertas abertos",
-      "A tabela e tambem a via de acesso alternativa a cor: tudo que os "
-      "graficos acima comunicam visualmente esta aqui em texto.")
+# --- 6. Fila de triagem ----------------------------------------------------
 
 fila = consultar("""
     SELECT severidade::text AS sev, regra, COALESCE(mitre_tecnica,'—') AS mitre,
@@ -511,19 +524,31 @@ fila = consultar("""
     FROM vw_alertas_abertos LIMIT 200
 """)
 
-if not fila.empty:
-    fila.insert(0, "sinal", fila["sev"].map(ICONE_SEVERIDADE))
-    st.dataframe(
-        fila, use_container_width=True, hide_index=True, height=360,
-        column_config={
-            "sinal": st.column_config.TextColumn("", width="small"),
-            "sev": st.column_config.TextColumn("Severidade", width="small"),
-            "regra": st.column_config.TextColumn("Regra", width="medium"),
-            "mitre": st.column_config.TextColumn("MITRE", width="small"),
-            "ip": st.column_config.TextColumn("IP", width="small"),
-            "pais": st.column_config.TextColumn("Pais", width="small"),
-            "janela_inicio": st.column_config.DatetimeColumn(
-                "Janela", format="DD/MM/YYYY HH:mm"),
-            "evidencia": st.column_config.TextColumn("Evidencia", width="large"),
-        })
-    st.caption(f"{len(fila)} de {milhar(resumo['alertas_abertos'])} alertas abertos.")
+with st.container():
+    cartao()
+    cabecalho_grafico(
+        "Alertas aguardando análise",
+        "Cada linha é um alerta que uma regra gerou e ninguém revisou ainda. "
+        "A coluna <b>evidência</b> traz os números que sustentam o alerta. "
+        "Esta tabela é também a via de acesso alternativa à cor: tudo que os "
+        "gráficos comunicam visualmente está aqui em texto.")
+
+    if fila.empty:
+        st.info("Nenhum alerta aberto.")
+    else:
+        fila.insert(0, "sinal", fila["sev"].map(ICONE_SEVERIDADE))
+        st.dataframe(
+            fila, use_container_width=True, hide_index=True, height=380,
+            column_config={
+                "sinal": st.column_config.TextColumn("", width="small"),
+                "sev": st.column_config.TextColumn("Gravidade", width="small"),
+                "regra": st.column_config.TextColumn("Regra", width="medium"),
+                "mitre": st.column_config.TextColumn("MITRE", width="small"),
+                "ip": st.column_config.TextColumn("IP de origem", width="small"),
+                "pais": st.column_config.TextColumn("Pais", width="small"),
+                "janela_inicio": st.column_config.DatetimeColumn(
+                    "Quando", format="DD/MM/YYYY HH:mm"),
+                "evidencia": st.column_config.TextColumn("Evidencia", width="large"),
+            })
+        legenda(f"Exibindo {len(fila)} de "
+                f"{milhar(resumo['alertas_abertos'])} alertas abertos.")
