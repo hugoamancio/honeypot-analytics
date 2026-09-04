@@ -54,6 +54,13 @@ source cowrie-env/bin/activate
 pip install --quiet --upgrade pip
 pip install --quiet -r requirements.txt
 
+# O Cowrie moderno se instala como PACOTE - o pyproject.toml declara
+# `cowrie = "cowrie.scripts.cowrie:run"` em [project.scripts]. Sem este
+# passo existem as dependencias mas nao o executavel, e o start falha com
+# "bin/cowrie: No such file or directory" (o bin/cowrie das versoes antigas
+# nao existe mais).
+pip install --quiet -e .
+
 verde "==> 4/6  Aplicando a configuracao do projeto"
 CFG_ORIGEM="$(dirname "$(readlink -f "$0")")"
 if [ -f "$CFG_ORIGEM/cowrie.cfg" ]; then
@@ -75,7 +82,11 @@ fi
 verde "==> 5/6  Povoando o sistema de arquivos falso"
 # Diretorio /home vazio e um dos sinais mais faceis de detectar. Alguns
 # arquivos plausiveis bastam para o bot seguir o playbook em vez de sair.
-mkdir -p honeyfs/home/admin honeyfs/var/www/html honeyfs/opt
+#
+# honeyfs/etc PRECISA estar nesta lista: o honeyfs que vem com o Cowrie
+# chega vazio, entao nada abaixo dele existe antes de ser criado aqui.
+# Faltava, e o script morria em "honeyfs/etc/motd: No such file or directory".
+mkdir -p honeyfs/etc honeyfs/home/admin honeyfs/var/www/html honeyfs/opt
 
 cat > honeyfs/etc/motd <<'MOTD'
 Welcome to Ubuntu 22.04.4 LTS (GNU/Linux 5.15.0-105-generic x86_64)
@@ -99,16 +110,50 @@ echo "web-prod-02" > honeyfs/etc/hostname
 printf 'server {\n    listen 80;\n    root /var/www/html;\n}\n' \
     > honeyfs/var/www/html/.nginx.conf.bak
 
-verde "==> 6/6  Subindo o Cowrie"
-bin/cowrie start
-sleep 3
+verde "==> 6/7  Servico do systemd (sobrevive a reboot)"
+# Sem isto o Cowrie morre no primeiro reinicio e o honeypot fica mudo sem
+# ninguem perceber - foi exatamente o que aconteceu num teste real. Um sensor
+# que so funciona ate a maquina reiniciar nao e um sensor.
+sudo tee /etc/systemd/system/cowrie.service >/dev/null <<EOF
+[Unit]
+Description=Cowrie SSH/Telnet Honeypot
+After=network-online.target
+Wants=network-online.target
 
-if bin/cowrie status 2>&1 | grep -qi "running"; then
+[Service]
+Type=forking
+User=$USER
+Group=$USER
+WorkingDirectory=$COWRIE_DIR
+Environment=PATH=$COWRIE_DIR/cowrie-env/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=$COWRIE_DIR/cowrie-env/bin/cowrie start
+ExecStop=$COWRIE_DIR/cowrie-env/bin/cowrie stop
+PIDFile=$COWRIE_DIR/var/run/cowrie.pid
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable cowrie >/dev/null 2>&1
+verde "    cowrie.service criado e habilitado no boot"
+
+verde "==> 7/7  Subindo o Cowrie"
+# `cowrie` (do venv), nao `bin/cowrie`: o wrapper antigo foi removido do
+# projeto e substituido pelo console script instalado no ambiente virtual.
+cowrie stop >/dev/null 2>&1 || true
+sudo systemctl restart cowrie
+sleep 6
+
+if cowrie status 2>&1 | grep -qi "running"; then
     verde ""
     verde "COWRIE NO AR"
     echo "  SSH falso ....... porta 2222"
     echo "  Telnet falso .... porta 2223"
     echo "  Log JSON ........ $COWRIE_DIR/var/log/cowrie/cowrie.json"
+    echo "  Servico ......... systemctl status cowrie  (volta sozinho no boot)"
     echo ""
     aviso "AINDA NAO CHEGA TRAFEGO DA INTERNET."
     aviso "Falta liberar as portas e redirecionar a 22 - ver DEPLOY.md."
@@ -116,5 +161,6 @@ if bin/cowrie status 2>&1 | grep -qi "running"; then
 else
     echo "ERRO: o Cowrie nao subiu. Veja o log:"
     echo "    tail -40 $COWRIE_DIR/var/log/cowrie/cowrie.log"
+    tail -20 "$COWRIE_DIR/var/log/cowrie/cowrie.log" 2>/dev/null || true
     exit 1
 fi
