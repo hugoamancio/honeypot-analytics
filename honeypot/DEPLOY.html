@@ -6,37 +6,37 @@
 <style>
   :root {
     color-scheme: light;
-    --ground:#E7ECEB; --surface:#F9FBFB; --raised:#FFFFFF;
+    --ground:#E7ECEB; --surface:#F9FBFB;
     --ink:#0F1E1D; --ink-2:#465655; --muted:#788786;
     --rule:#CFD9D8; --rule-soft:#DFE7E6;
     --accent:#0C6567; --accent-w:#E0EDED;
     --perigo:#9A2020; --perigo-w:#F7E4E4;
     --cuidado:#96460F; --cuidado-w:#F6E8DE;
-    --ok:#2A6544;
+    --ok:#2A6544; --ok-w:#E2EDE6;
     --term-bg:#0F1E1D; --term-ink:#D8E4E3;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --ground:#0A1211; --surface:#121D1C; --raised:#172423;
+      --ground:#0A1211; --surface:#121D1C;
       --ink:#E9F0EF; --ink-2:#A6B4B3; --muted:#788786;
       --rule:#233231; --rule-soft:#1B2827;
       --accent:#3BA9AB; --accent-w:#102A2B;
       --perigo:#E06A6A; --perigo-w:#2C1414;
       --cuidado:#D2843F; --cuidado-w:#2A1C10;
-      --ok:#58A277;
+      --ok:#58A277; --ok-w:#12271B;
       --term-bg:#060C0C; --term-ink:#C8D6D5;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --ground:#0A1211; --surface:#121D1C; --raised:#172423;
+    --ground:#0A1211; --surface:#121D1C;
     --ink:#E9F0EF; --ink-2:#A6B4B3; --muted:#788786;
     --rule:#233231; --rule-soft:#1B2827;
     --accent:#3BA9AB; --accent-w:#102A2B;
     --perigo:#E06A6A; --perigo-w:#2C1414;
     --cuidado:#D2843F; --cuidado-w:#2A1C10;
-    --ok:#58A277;
+    --ok:#58A277; --ok-w:#12271B;
     --term-bg:#060C0C; --term-ink:#C8D6D5;
   }
 
@@ -46,7 +46,7 @@
          font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased; }
 
   .folha { max-width:860px; margin:0 auto; padding:52px 24px 96px;
-           display:flex; flex-direction:column; gap:42px; }
+           display:flex; flex-direction:column; gap:40px; }
 
   .carimbo { font-family:"IBM Plex Mono",monospace; font-size:11px;
              letter-spacing:.16em; text-transform:uppercase;
@@ -61,7 +61,6 @@
   p + p { margin-top:12px; }
   .nota { color:var(--ink-2); font-size:15px; }
 
-  /* ---- Etapas: a numeracao e real, a ordem importa ---- */
   .etapa { display:flex; flex-direction:column; gap:16px;
            border-top:1px solid var(--rule); padding-top:26px; }
   .cabeca { display:flex; gap:18px; align-items:flex-start; }
@@ -71,17 +70,16 @@
          align-items:center; justify-content:center; margin-top:2px; }
   .num.perigo { background:var(--perigo); }
 
-  /* ---- Terminal ---- */
   pre { background:var(--term-bg); color:var(--term-ink); margin:0;
         padding:16px 18px; overflow-x:auto; border-radius:4px;
         font-family:"IBM Plex Mono",ui-monospace,monospace;
         font-size:13.5px; line-height:1.65; }
   pre .c { color:var(--muted); }
   pre .g { color:var(--ok); }
+  pre .r { color:var(--perigo); }
   code { font-family:"IBM Plex Mono",monospace; font-size:.88em;
          background:var(--accent-w); color:var(--accent); padding:1px 5px; }
 
-  /* ---- Blocos de alerta ---- */
   .bloco { padding:20px 24px; display:flex; flex-direction:column; gap:10px; }
   .bloco .t { font-family:"IBM Plex Mono",monospace; font-size:10.5px;
               letter-spacing:.14em; text-transform:uppercase; font-weight:600; }
@@ -89,8 +87,10 @@
   .perigo-b .t { color:var(--perigo); }
   .cuidado-b { background:var(--cuidado-w); border:1px solid var(--cuidado); }
   .cuidado-b .t { color:var(--cuidado); }
-  .info-b    { background:var(--surface); border:1px solid var(--rule);
-               border-left:3px solid var(--accent); }
+  .ok-b { background:var(--ok-w); border:1px solid var(--ok); }
+  .ok-b .t { color:var(--ok); }
+  .info-b { background:var(--surface); border:1px solid var(--rule);
+            border-left:3px solid var(--accent); }
   .info-b .t { color:var(--accent); }
 
   table { width:100%; border-collapse:collapse; font-size:15px; }
@@ -115,7 +115,7 @@
            border-top:1px solid var(--rule); padding-top:22px; }
 
   @media (max-width:560px) {
-    .folha { padding:34px 18px 70px; gap:34px; }
+    .folha { padding:34px 18px 70px; gap:32px; }
     pre { font-size:12px; padding:13px 14px; }
     .bloco { padding:16px 18px; }
     .cabeca { gap:12px; }
@@ -128,78 +128,89 @@
     <div class="carimbo">Honeypot Analytics · etapa final</div>
     <h1>Implantação do Sensor</h1>
     <p class="nota">
-      Da instância vazia na Oracle Cloud até o primeiro ataque real chegando
-      no seu banco. Siga na ordem: duas etapas aqui podem trancar você para
-      fora do servidor, e a ordem existe para impedir isso.
+      Do servidor vazio até o primeiro ataque real no banco. Reescrito depois
+      de uma implantação de verdade — inclusive a tentativa que derrubou um
+      servidor. Os avisos aqui não são hipotéticos.
     </p>
   </header>
 
   <div class="bloco perigo-b">
-    <div class="t">A regra que salva o servidor</div>
+    <div class="t">O erro que custou um servidor</div>
     <p>
-      A partir da <b>etapa 4</b>, mantenha <b>duas sessões SSH abertas ao
-      mesmo tempo</b>. Faça toda mudança na primeira e confirme na segunda.
+      No Ubuntu 24.04 existem <b>dois mecanismos concorrentes</b> de iniciar o
+      sshd: <code>ssh.socket</code> (ativação por socket do systemd) e
+      <code>ssh.service</code>. Na primeira tentativa, a porta foi alterada no
+      socket <b>com o service ainda ativo</b>.
     </p>
     <p>
-      Se você fechar a única sessão depois de mexer no SSH e algo estiver
-      errado, não existe recuperação: a máquina vira inacessível e o caminho
-      é apagar e recomeçar. A segunda janela custa dez segundos e é a
-      diferença entre um susto e uma tarde perdida.
+      Os dois passaram a disputar a porta 22. O systemd tentou, falhou, e
+      derrubou o SSH inteiro — <b>inclusive a porta 22, que estava
+      funcionando</b>. O reboot não resolveu: o conflito se repetia a cada
+      boot. O servidor foi perdido.
+    </p>
+    <p>
+      A regra: <b>desligue um antes de mexer no outro.</b> É o que o
+      <code>mudar_porta_ssh.sh</code> faz no primeiro passo, e por isso ele
+      existe.
     </p>
   </div>
 
   <!-- 1 -->
   <section class="etapa">
     <div class="cabeca"><div class="num">1</div>
-      <div><h2>Criar a instância</h2></div></div>
+      <div><h2>Criar o servidor</h2></div></div>
 
     <p class="nota">
-      Console da Oracle → <b>Compute</b> → <b>Instances</b> →
-      <b>Create instance</b>.
+      Qualquer provedor serve — foi validado na DigitalOcean. O requisito é só
+      Ubuntu e IP público.
     </p>
 
     <div class="tw">
       <table>
-        <tr><th>Campo</th><th>Escolha</th></tr>
-        <tr><td class="k">Image</td><td>Ubuntu 22.04</td></tr>
-        <tr><td class="k">Shape</td><td><b>VM.Standard.E2.1.Micro</b> (AMD)</td></tr>
-        <tr><td class="k">SSH key</td><td>Generate a key pair for me → <b>baixar a chave privada</b></td></tr>
+        <tr><th>Item</th><th>Valor</th></tr>
+        <tr><td class="k">Sistema</td><td>Ubuntu 22.04 ou 24.04</td></tr>
+        <tr><td class="k">RAM</td><td>1 GB (o Cowrie é leve)</td></tr>
+        <tr><td class="k">Acesso</td><td>chave SSH, nunca senha</td></tr>
       </table>
     </div>
 
     <div class="bloco cuidado-b">
-      <div class="t">Duas escolhas sem volta</div>
+      <div class="t">Onde se perde tempo</div>
       <p>
-        <b>A região é permanente.</b> Escolha São Paulo ou Vinhedo. Não dá
-        para trocar depois.
+        <b>A chave precisa estar marcada no servidor</b>, não só cadastrada na
+        conta. Na primeira tentativa ela foi adicionada à conta mas ficou
+        desmarcada no formulário — o servidor subiu sem acesso nenhum e teve
+        que ser recriado.
       </p>
       <p>
-        <b>Não escolha a forma ARM (Ampere A1).</b> É a mais generosa e por
-        isso vive esgotada — você vai bater em
-        <code>Out of host capacity</code> repetidamente. A E2.1.Micro tem
-        1 GB de RAM, sempre tem vaga, e sobra para o Cowrie.
+        Gere a chave antes, e cole a pública no formulário:
       </p>
-      <p>
-        <b>A chave privada só baixa uma vez.</b> Perdeu, perdeu a máquina.
-      </p>
+<pre>ssh-keygen -t ed25519 -f $HOME\.ssh\honeypot -C honeypot
+<span class="c"># cole o conteudo de honeypot.pub no provedor</span></pre>
     </div>
   </section>
 
   <!-- 2 -->
   <section class="etapa">
     <div class="cabeca"><div class="num">2</div>
-      <div><h2>Conectar</h2></div></div>
+      <div><h2>Criar um usuário sem root</h2></div></div>
 
     <p class="nota">
-      Anote o <b>IP público</b> que aparece na página da instância. No
-      Windows, a chave precisa ter permissão restrita ou o SSH recusa usá-la.
+      A maioria dos provedores entrega a máquina só com <code>root</code>. Um
+      honeypot é feito para ser atacado — rodando como root, um escape do
+      ambiente falso vira controle total. O instalador se recusa a rodar como
+      root justamente por isso.
     </p>
 
-<pre><span class="c"># restringe a chave a você (uma vez só)</span>
-icacls C:\caminho\chave.key /inheritance:r /grant:r "%USERNAME%:R"
+<pre>ssh -i chave root@SEU_IP
 
-<span class="c"># conecta — porta 22 ainda é a sua, o honeypot não existe ainda</span>
-ssh -i C:\caminho\chave.key ubuntu@SEU_IP</pre>
+adduser --disabled-password --gecos "" sensor
+usermod -aG sudo sensor
+mkdir -p /home/sensor/.ssh
+cp /root/.ssh/authorized_keys /home/sensor/.ssh/
+chown -R sensor:sensor /home/sensor/.ssh
+chmod 700 /home/sensor/.ssh &amp;&amp; chmod 600 /home/sensor/.ssh/authorized_keys
+echo "sensor ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-sensor</pre>
   </section>
 
   <!-- 3 -->
@@ -207,183 +218,180 @@ ssh -i C:\caminho\chave.key ubuntu@SEU_IP</pre>
     <div class="cabeca"><div class="num">3</div>
       <div><h2>Instalar o Cowrie</h2></div></div>
 
-    <p class="nota">
-      Envie os três arquivos do projeto e rode o instalador. Ele sobe o
-      Cowrie em 2222 e 2223 e <b>não toca na porta 22</b> — nada de trânsito
-      da internet ainda.
-    </p>
+<pre><span class="c"># da sua maquina</span>
+scp -i chave honeypot/*.sh honeypot/cowrie.cfg honeypot/userdb.txt sensor@SEU_IP:~/
 
-<pre><span class="c"># da SUA máquina, envia os arquivos</span>
-scp -i chave.key honeypot/cowrie.cfg honeypot/userdb.txt honeypot/instalar.sh ubuntu@SEU_IP:~/
-
-<span class="c"># já no servidor</span>
-chmod +x instalar.sh
+<span class="c"># no servidor</span>
+chmod +x ~/*.sh
 ./instalar.sh</pre>
 
     <p class="nota">
-      Leva uns 5 minutos. No fim aparece <span style="color:var(--ok)">COWRIE
-      NO AR</span> com as portas.
+      Leva de 5 a 10 minutos. Sobe o Cowrie em 2222 e 2223, cria o serviço do
+      systemd, e <b>não toca na porta 22</b>.
     </p>
+
+    <div class="bloco info-b">
+      <div class="t">O que o instalador resolve por você</div>
+      <ul class="l">
+        <li><b>Banner falso.</b> O Cowrie de fábrica é reconhecível; ele passa
+          a se anunciar como <code>OpenSSH_8.4p1 Debian-5+deb11u1</code>.</li>
+        <li><b>Hostname plausível.</b> <code>web-prod-02</code> no lugar de
+          <code>svr04</code>, que é string procurada por scanner de honeypot.</li>
+        <li><b>userdb sem curinga.</b> Aceitar qualquer senha denuncia a
+          armadilha — nenhum servidor real aceita <code>root/qualquercoisa</code>.</li>
+        <li><b>Serviço systemd.</b> Sem ele o Cowrie morre no primeiro reboot e
+          o sensor fica mudo sem ninguém perceber.</li>
+      </ul>
+    </div>
   </section>
 
   <!-- 4 -->
   <section class="etapa">
-    <div class="cabeca"><div class="num perigo">4</div>
-      <div><h2>Mudar o seu SSH de porta</h2></div></div>
-
-    <div class="bloco perigo-b">
-      <div class="t">Abra a segunda sessão agora</div>
-      <p>
-        Antes de digitar qualquer coisa desta etapa, abra <b>outra janela</b>
-        e conecte de novo no servidor. Ela é a sua rede de segurança e só
-        pode ser fechada no fim da etapa 5.
-      </p>
-    </div>
+    <div class="cabeca"><div class="num">4</div>
+      <div><h2>Reiniciar de propósito</h2></div></div>
 
     <p class="nota">
-      O truque que elimina o risco: o SSH vai escutar nas <b>duas</b> portas
-      durante a transição. Só removemos a 22 depois de confirmar que a 2200
-      funciona.
+      Não é paranoia — é o teste que um defeito real pediu. Na primeira
+      implantação o Cowrie subia à mão e não voltava no boot. Descobrir isso
+      agora custa dois minutos; descobrir em produção custa semanas de coleta
+      perdida.
     </p>
 
-<pre><span class="c"># 1. libera a 2200 no firewall do Ubuntu, ANTES de tudo</span>
-<span class="c">#    veja onde está a regra REJECT e insira antes dela</span>
-sudo iptables -L INPUT --line-numbers | head -12
-sudo iptables -I INPUT 6 -p tcp --dport 2200 -m state --state NEW -j ACCEPT
-sudo netfilter-persistent save
+<pre>sudo systemctl reboot
 
-<span class="c"># 2. faz o sshd escutar nas DUAS portas</span>
-sudo sed -i 's/^#*Port 22$/Port 22\nPort 2200/' /etc/ssh/sshd_config
-sudo sshd -t          <span class="c"># valida a sintaxe — se der erro, PARE</span>
-sudo systemctl restart ssh</pre>
-
-    <p class="nota">
-      Agora, no console da Oracle, abra a porta na rede:
-      <b>Networking → Virtual Cloud Networks → sua VCN → Security Lists →
-      Default → Add Ingress Rule</b> — origem <code>0.0.0.0/0</code>, TCP,
-      porta <b>2200</b>.
-    </p>
-
-<pre><span class="c"># 3. da SUA máquina, numa TERCEIRA janela, teste a porta nova</span>
-ssh -i chave.key -p 2200 ubuntu@SEU_IP</pre>
-
-    <div class="bloco cuidado-b">
-      <div class="t">Ponto de decisão</div>
-      <p>
-        Entrou pela 2200? Siga. <b>Não entrou?</b> Não feche nada — volte na
-        sessão que ainda está aberta e desfaça: o problema é quase sempre a
-        regra do Security List ou a posição da regra no iptables.
-      </p>
-    </div>
+<span class="c"># espere ~1 min e, da sua maquina, confirme que as portas voltaram</span>
+<span class="g">22, 2222, 2223 devem estar abertas</span></pre>
   </section>
 
   <!-- 5 -->
   <section class="etapa">
     <div class="cabeca"><div class="num perigo">5</div>
-      <div><h2>Entregar a porta 22 ao honeypot</h2></div></div>
+      <div><h2>Mover seu SSH para a 2200</h2></div></div>
+
+<pre>./mudar_porta_ssh.sh</pre>
 
     <p class="nota">
-      Só faça isto com a 2200 confirmada. Agora removemos a 22 do seu SSH e
-      redirecionamos para o Cowrie.
+      O script desliga o <code>ssh.socket</code> <b>antes</b> de qualquer
+      alteração, valida com <code>sshd -t</code> antes de reiniciar, e deixa o
+      SSH nas <b>duas portas</b>. A 22 continua sendo sua rede de segurança até
+      o próximo passo.
     </p>
 
-<pre><span class="c"># 1. sshd deixa de escutar na 22</span>
-sudo sed -i '/^Port 22$/d' /etc/ssh/sshd_config
-sudo sshd -t
-sudo systemctl restart ssh
-
-<span class="c"># 2. tudo que chegar na 22 vai para o Cowrie (2222); na 23, para 2223</span>
-sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
-sudo iptables -t nat -A PREROUTING -p tcp --dport 23 -j REDIRECT --to-port 2223
-
-<span class="c"># 3. libera as portas do honeypot no firewall</span>
-sudo iptables -I INPUT 6 -p tcp --dport 2222 -m state --state NEW -j ACCEPT
-sudo iptables -I INPUT 6 -p tcp --dport 2223 -m state --state NEW -j ACCEPT
-sudo netfilter-persistent save</pre>
-
-    <p class="nota">
-      No Security List da Oracle, adicione ingresso <code>0.0.0.0/0</code>
-      TCP para as portas <b>22</b> e <b>23</b>.
-    </p>
-
-    <div class="bloco info-b">
-      <div class="t">De agora em diante</div>
+    <div class="bloco perigo-b">
+      <div class="t">Não pule este teste</div>
       <p>
-        Você entra no servidor pela <b>porta 2200</b>. A porta 22 pertence ao
-        honeypot — conectar nela te leva ao sistema falso, o que rende uma
-        confusão memorável às duas da manhã.
+        De outra janela, <b>de fora do servidor</b>:
+      </p>
+<pre>ssh -i chave -p 2200 sensor@SEU_IP</pre>
+      <p>
+        Entrou? Siga. <b>Não entrou?</b> Pare aqui. A 22 ainda funciona e você
+        tem tempo de investigar. Depois do passo 6 não tem.
       </p>
     </div>
   </section>
 
   <!-- 6 -->
   <section class="etapa">
-    <div class="cabeca"><div class="num">6</div>
-      <div><h2>Confirmar que está pegando</h2></div></div>
+    <div class="cabeca"><div class="num perigo">6</div>
+      <div><h2>Entregar a porta 22 ao honeypot</h2></div></div>
 
-<pre><span class="c"># acompanhe ao vivo — os primeiros bots costumam chegar em minutos</span>
-tail -f ~/cowrie/var/log/cowrie/cowrie.json | jq -r \
-  '"\(.timestamp)  \(.src_ip)  \(.eventid)  \(.username // "")/\(.password // "")"'</pre>
+<pre>./entregar_porta22.sh</pre>
 
     <p class="nota">
-      Se em uma hora não apareceu nada, o problema é quase sempre o Security
-      List. Teste de fora com <code>ssh -p 22 teste@SEU_IP</code> — deve pedir
-      senha (e é o Cowrie respondendo).
+      Remove a 22 do sshd, redireciona 22 → 2222 e 23 → 2223 por NAT, e salva
+      as regras para sobreviverem ao reboot. O script <b>se recusa a rodar</b>
+      se a 2200 não estiver escutando.
     </p>
+
+    <div class="bloco info-b">
+      <div class="t">De agora em diante</div>
+      <p>
+        Você entra por <code>ssh -p 2200</code>. Conectar na 22 te leva ao
+        sistema falso — confusão memorável às duas da manhã.
+      </p>
+    </div>
   </section>
 
   <!-- 7 -->
   <section class="etapa">
     <div class="cabeca"><div class="num">7</div>
-      <div><h2>Trazer para o banco</h2></div></div>
+      <div><h2>Provar que a isca funciona</h2></div></div>
 
     <p class="nota">
-      Na sua máquina, com o Docker e o Postgres de pé:
+      Compare os banners das duas portas. Se forem diferentes, o
+      redirecionamento está certo:
     </p>
 
-<pre>.\honeypot\coletar.ps1 -Ip SEU_IP -Chave C:\caminho\chave.key</pre>
+<pre>22   <span class="g">SSH-2.0-OpenSSH_8.4p1 Debian-5+deb11u1</span>   <span class="c">&lt;- Cowrie</span>
+2200 <span class="c">SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.16  &lt;- seu SSH real</span></pre>
 
     <p class="nota">
-      O script baixa o log, ingere e roda as regras. <b>Nenhuma linha do
-      pipeline muda</b> — o formato é o mesmo do gerador sintético, que foi
-      exatamente o motivo de ele existir.
+      Os primeiros bots costumam chegar em minutos a poucas horas. Acompanhe:
     </p>
 
-    <div class="bloco cuidado-b">
-      <div class="t">Antes da primeira coleta real</div>
-      <p>
-        Limpe os dados sintéticos, senão as duas fontes se misturam e nenhum
-        número do README significa mais nada:
-      </p>
-<pre>docker exec honeypot_db psql -U analista -d honeypot \
-  -c "TRUNCATE origem, credencial, arquivo_processado RESTART IDENTITY CASCADE;"</pre>
-    </div>
+<pre>tail -f ~/cowrie/var/log/cowrie/cowrie.json | jq -r \
+  '"\(.src_ip)  \(.eventid)  \(.username // "")/\(.password // "")"'</pre>
   </section>
 
   <!-- 8 -->
   <section class="etapa">
     <div class="cabeca"><div class="num">8</div>
-      <div><h2>Higiene do servidor</h2></div></div>
+      <div><h2>Trazer para o banco</h2></div></div>
+
+<pre>.\honeypot\coletar.ps1 -Ip SEU_IP -Chave C:\Users\voce\.ssh\honeypot</pre>
+
+    <p class="nota">
+      Baixa o log, ingere e roda as 11 regras. <b>Nenhuma linha do pipeline
+      muda</b> — o formato é o mesmo do gerador sintético, que foi exatamente
+      o motivo de ele existir.
+    </p>
+
+    <div class="bloco cuidado-b">
+      <div class="t">Antes da primeira coleta real</div>
+      <p>Limpe o dado sintético, senão as duas fontes se misturam:</p>
+<pre>docker exec honeypot_db psql -U analista -d honeypot \
+  -c "TRUNCATE origem, credencial, arquivo_processado RESTART IDENTITY CASCADE;"</pre>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="etapa">
+    <div class="cabeca"><div class="num">9</div>
+      <div><h2>Higiene</h2></div></div>
 
     <ul class="l">
       <li><b>Nada seu na máquina.</b> Sem arquivos pessoais, sem chave que
         sirva em outro lugar. Ela é descartável por definição.</li>
-      <li><b>Senha desativada no seu SSH.</b> Só chave —
+      <li><b>Só chave no seu SSH.</b>
         <code>PasswordAuthentication no</code> no <code>sshd_config</code>.</li>
-      <li><b>Atualize.</b> <code>sudo apt update &amp;&amp; sudo apt upgrade</code>
-        de vez em quando.</li>
-      <li><b>Olhe o disco.</b> O log cresce rápido; <code>df -h</code>
-        semanalmente evita surpresa.</li>
-      <li><b>Nunca execute o que os bots baixam.</b> O Cowrie guarda os
-        artefatos em <code>var/lib/cowrie/downloads</code> — são malware de
-        verdade. O projeto grava apenas o hash, nunca o conteúdo.</li>
+      <li><b>Olhe o disco.</b> <code>df -h</code> de vez em quando — o log
+        cresce rápido quando o tráfego aparece.</li>
+      <li><b>Nunca execute o que os bots baixam.</b> Os artefatos em
+        <code>var/lib/cowrie/downloads</code> são malware real. O projeto
+        grava apenas o hash, nunca o conteúdo.</li>
     </ul>
   </section>
 
+  <div class="bloco ok-b">
+    <div class="t">Registro da implantação real</div>
+    <p>
+      Validado em <b>Ubuntu 24.04 na DigitalOcean</b>, 1 GB de RAM. Quatro
+      defeitos foram encontrados e corrigidos no processo: <code>honeyfs/etc</code>
+      ausente, <code>bin/cowrie</code> inexistente nas versões novas, Cowrie
+      sem serviço no boot, e o conflito socket × service que derrubou o
+      primeiro servidor.
+    </p>
+    <p>
+      Provedores com firewall próprio (Oracle Cloud, AWS, Azure) exigem um
+      passo a mais: liberar 22, 23 e 2200 no grupo de segurança. A DigitalOcean
+      não bloqueia nada por padrão.
+    </p>
+  </div>
+
   <footer>
     Honeypot Analytics · sensor honeypot-udi-01<br>
-    Depois de ~2 semanas de coleta: remedir a concentração de senhas,
-    rodar o enriquecimento de ASN, e reescrever os números do README.<br>
+    Depois de ~2 semanas: remedir a concentração de senhas, rodar o
+    enriquecimento de ASN, reescrever os números do README.<br>
     Aí o projeto deixa de ser exercício.
   </footer>
 
